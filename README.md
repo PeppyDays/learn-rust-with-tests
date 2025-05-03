@@ -32,3 +32,9 @@ npm install
 pre-commit install
 pre-commit install --hook-type commit-msg
 ```
+
+## To Do
+
+- [ ] Add English grammar and fluency check in CI
+- [ ] Finish prefix first
+- [ ] Finish Rust Fundamentals
