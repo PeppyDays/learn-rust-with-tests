@@ -1,0 +1,15 @@
+version: "3"
+
+tasks:
+  serve:
+    desc: Serve the book
+    cmds:
+      - mdbook serve --open
+  test:
+    desc: Test the book
+    cmds:
+      - mdbook test
+  build:
+    desc: Build the book
+    cmds:
+      - mdbook build
