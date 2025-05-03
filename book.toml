@@ -1,0 +1,10 @@
+[book]
+title = "Learn Rust with Tests"
+authors = ["Arine"]
+description = "A book about learning Rust through testing, inspired by the book 'Learn Go with Tests'."
+language = "en"
+multilingual = true
+src = "src"
+
+[rust]
+edition = "2024"
