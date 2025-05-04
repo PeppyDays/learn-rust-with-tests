@@ -8,3 +8,6 @@ src = "src"
 
 [rust]
 edition = "2024"
+
+[output.html.playground]
+runnable = false
