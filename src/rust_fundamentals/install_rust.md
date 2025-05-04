@@ -96,4 +96,4 @@ RustRover is a JetBrains IDE for Rust. It is a great option if you are already f
 
 ## Wrapping up
 
-At this point, you should have Rust installed, an editor available, and some basic tooling in place. Rust has a very large ecosystem of third-party products. We have identified a few useful components here. For a more complete list, see [Awesome Rust](https://github.com/rust-unofficial/awesome-rust).
+At this point, you should have Rust installed, an editor available, and some basic tooling in place. Rust has a very large ecosystem of third-party products. If you find some useful components, see [Awesome Rust](https://github.com/rust-unofficial/awesome-rust).
