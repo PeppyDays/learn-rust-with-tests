@@ -2,8 +2,6 @@
 
 You can find all the code for this chapter [here](https://github.com/PeppyDays/learn-rust-with-tests/tree/main/examples/integers).
 
-## Introduction
-
 Integers work as you would expect. Let's write an `add` function to try things out. Create a new project where you want to practice with `cargo new integers`.
 
 ## Write the Test First
