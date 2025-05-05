@@ -2,7 +2,7 @@
 
 You can find all the code for this chapter [here](https://github.com/PeppyDays/learn-rust-with-tests/tree/main/examples/hello).
 
-## Introduction
+## How to Start
 
 It is traditional for your first program in a new language to be [Hello, World](https://en.m.wikipedia.org/wiki/%22Hello,_World!%22_program). To start with that, we will create a new Rust project. You can do this by running the following command in your terminal anywhere you like:
 
@@ -1061,10 +1061,10 @@ Who knew you could get so much out of `Hello, World`? By now you should have som
 
 ### Some of Rust's Syntax
 
-  - Writing tests
-  - Declaring functions with arguments and return types
-  - Using `const`, `if` and `match` statements
-  - Declaring variables and constants
+- Writing tests
+- Declaring functions with arguments and return types
+- Using `const`, `if` and `match` statements
+- Declaring variables and constants
 
 ### The TDD Process
 
