@@ -8,7 +8,7 @@ When you have arrays, it is very common to have to iterate over them. So let's u
 
 Let's use our TDD skills.
 
-## The First Requirement: Sum an Array of 5 Numbers
+## The First Requirement: Sum an Array of Five Numbers
 
 ### Write the Test First
 
