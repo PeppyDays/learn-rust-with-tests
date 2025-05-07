@@ -375,7 +375,7 @@ pub fn greet(name: &str) -> String {
 #     fn sut_returns_hello_world_if_empty_name_is_given() {
 #         // Act
 #         let actual = greet("");
-# 
+#
 #         // Assert
 #         let expected = "Hello, World!";
 #         assert_eq!(expected, actual);
@@ -729,7 +729,7 @@ You should refactor tests as well because the name and intention of tests are no
 # const SPANISH: &str = "Spanish";
 # const GREETING_PREFIX_FOR_ENGLISH: &str = "Hello, ";
 # const GREETING_PREFIX_FOR_SPANISH: &str = "Hola, ";
-# 
+#
 # pub fn greet(name: &str, language: &str) -> String {
 #     let name = if name.is_empty() { "World" } else { name };
 #     let prefix = if language == SPANISH {
@@ -777,10 +777,10 @@ You should refactor tests as well because the name and intention of tests are no
 #         // Arrange
 #         let name = "Elodie";
 #         let language = "Spanish";
-# 
+#
 #         // Act
 #         let actual = greet(name, language);
-# 
+#
 #         // Assert
 #         let expected = "Hola, Elodie!";
 #         assert_eq!(expected, actual);
