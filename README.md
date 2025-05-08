@@ -1,6 +1,6 @@
 # Learn Rust with Tests
 
-I'm writing Rust version of [Learn Go with Tests](https://github.com/quii/learn-go-with-tests?tab=readme-ov-file).
+I'm writing Rust version of [Learn Go with Tests](https://github.com/quii/learn-go-with-tests?tab=readme-ov-file). You can check this book [here](https://peppydays.github.io/learn-rust-with-tests/).
 
 ## Setup
 
