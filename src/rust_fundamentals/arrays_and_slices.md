@@ -1,5 +1,7 @@
 # Arrays and Slices
 
+<!-- TODO: Modify the content to use `<const N: usize>` instead of vectors, referencing [maps](./maps.md) -->
+
 You can find all the code for this chapter [here](https://github.com/PeppyDays/learn-rust-with-tests/tree/main/examples/arrays).
 
 Arrays allow you to store multiple elements of the same type in a variable in a particular order.
