@@ -15,6 +15,7 @@
 - [Structs, Methods and Traits](./rust_fundamentals/structs_methods_and_traits.md)
 - [Errors](./rust_fundamentals/errors.md)
 - [Maps](./rust_fundamentals/maps.md)
+- [Dependency Injection](./rust_fundamentals/dependency_injection.md)
 
 ---
 
