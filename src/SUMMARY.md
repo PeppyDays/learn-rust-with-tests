@@ -16,6 +16,7 @@
 - [Errors](./rust_fundamentals/errors.md)
 - [Maps](./rust_fundamentals/maps.md)
 - [Dependency Injection](./rust_fundamentals/dependency_injection.md)
+- [Mocking](./rust_fundamentals/mocking.md)
 
 ---
 
