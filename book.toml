@@ -9,5 +9,6 @@ src = "src"
 [rust]
 edition = "2024"
 
-[output.html.playground]
-runnable = false
+[output.html]
+git-repository-url = "https://github.com/PeppyDays/learn-rust-with-tests"
+playground.runnable = false

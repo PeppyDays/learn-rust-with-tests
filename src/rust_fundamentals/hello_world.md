@@ -61,8 +61,6 @@ pub fn greet() -> String {
 ```
 
 ```rust,ignore
-# use hello::greet;
-#
 fn main() {
     println!("{}", greet());
 }
@@ -75,10 +73,6 @@ We have created a new function, but this time, we have added another keyword `St
 Now add test cases for our `greet` function under the `greet` function in `lib.rs`:
 
 ```rust
-# pub fn greet() -> String {
-#     String::from("Hello, World!")
-# }
-#
 #[cfg(test)]
 mod specs_for_greet {
     use super::greet;
@@ -146,24 +140,15 @@ Let's start by capturing these requirements in a test. This is basic test-driven
 We will replace the test we wrote to the new test in `specs_for_greet` module:
 
 ```rust
-# pub fn greet() -> String {
-#     String::from("Hello, World!")
-# }
-#
-# #[cfg(test)]
-# mod specs_for_greet {
-#     use super::greet;
-#
-    #[test]
-    fn sut_returns_hello_with_given_name_correctly() {
-        // Act
-        let actual = greet("Chris");
+#[test]
+fn sut_returns_hello_with_given_name_correctly() {
+    // Act
+    let actual = greet("Chris");
 
-        // Assert
-        let expected = "Hello, Chris!";
-        assert_eq!(expected, actual);
-    }
-# }
+    // Assert
+    let expected = "Hello, Chris!";
+    assert_eq!(expected, actual);
+}
 ```
 
 Now run `cargo test`, you should have a compilation error:
@@ -203,28 +188,11 @@ Edit the `greet` function to accept an argument of type `&str`:
 pub fn greet(name: &str) -> String {
     String::from("Hello, World!")
 }
-#
-# #[cfg(test)]
-# mod specs_for_greet {
-#     use super::greet;
-#
-#     #[test]
-#     fn sut_returns_hello_with_given_name_correctly() {
-#         // Act
-#         let actual = greet("Chris");
-#
-#         // Assert
-#         let expected = "Hello, Chris!";
-#         assert_eq!(expected, actual);
-#     }
-# }
 ```
 
 If you try and run your tests, it fails to compile because you're not passing an argument in `main.rs`. Send in "world" to make it compile.
 
 ```rust,ignore
-# use hello::greet;
-#
 fn main() {
     println!("{}", greet("world"));
 }
@@ -244,21 +212,6 @@ We finally have a compiling program but it is not meeting our requirements accor
 pub fn greet(name: &str) -> String {
     format!("Hello, {}!", name)
 }
-#
-# #[cfg(test)]
-# mod specs_for_greet {
-#     use super::greet;
-#
-#     #[test]
-#     fn sut_returns_hello_with_given_name_correctly() {
-#         // Act
-#         let actual = greet("Chris");
-#
-#         // Assert
-#         let expected = "Hello, Chris!";
-#         assert_eq!(expected, actual);
-#     }
-# }
 ```
 
 When you run the tests, they should now pass. Normally, as part of the TDD cycle, we should now refactor.
@@ -287,21 +240,6 @@ const GREETING_PREFIX_FOR_ENGLISH: &str = "Hello, ";
 pub fn greet(name: &str) -> String {
     format!("{}{}!", GREETING_PREFIX_FOR_ENGLISH, name)
 }
-#
-# #[cfg(test)]
-# mod specs_for_greet {
-#     use super::greet;
-#
-#     #[test]
-#     fn sut_returns_hello_with_given_name_correctly() {
-#         // Act
-#         let actual = greet("Chris");
-#
-#         // Assert
-#         let expected = "Hello, Chris!";
-#         assert_eq!(expected, actual);
-#     }
-# }
 ```
 
 After refactoring, re-run your tests to make sure you haven't broken anything. It's worth thinking about creating constants to capture the meaning of values and sometimes to aid performance.
@@ -313,36 +251,15 @@ The next requirement is when our function is called with an empty string it defa
 Start by writing a new failing test.
 
 ```rust
-# const GREETING_PREFIX_FOR_ENGLISH: &str = "Hello, ";
-#
-# pub fn greet(name: &str) -> String {
-#     format!("{}{}!", GREETING_PREFIX_FOR_ENGLISH, name)
-# }
-#
-# #[cfg(test)]
-# mod specs_for_greet {
-#     use super::greet;
-#
-#     #[test]
-#     fn sut_returns_hello_with_given_name_correctly() {
-#         // Act
-#         let actual = greet("Chris");
-#
-#         // Assert
-#         let expected = "Hello, Chris!";
-#         assert_eq!(expected, actual);
-#     }
-#
-    #[test]
-    fn sut_returns_hello_world_if_empty_name_is_given() {
-        // Act
-        let actual = greet("");
+#[test]
+fn sut_returns_hello_world_if_empty_name_is_given() {
+    // Act
+    let actual = greet("");
 
-        // Assert
-        let expected = "Hello, World!";
-        assert_eq!(expected, actual);
-    }
-# }
+    // Assert
+    let expected = "Hello, World!";
+    assert_eq!(expected, actual);
+}
 ```
 
 While we have a failing test, let's fix the code, using an if.
@@ -356,31 +273,6 @@ pub fn greet(name: &str) -> String {
     }
     format!("{}{}!", GREETING_PREFIX_FOR_ENGLISH, name)
 }
-#
-# #[cfg(test)]
-# mod specs_for_greet {
-#     use super::greet;
-#
-#     #[test]
-#     fn sut_returns_hello_with_given_name_correctly() {
-#         // Act
-#         let actual = greet("Chris");
-#
-#         // Assert
-#         let expected = "Hello, Chris!";
-#         assert_eq!(expected, actual);
-#     }
-#
-#     #[test]
-#     fn sut_returns_hello_world_if_empty_name_is_given() {
-#         // Act
-#         let actual = greet("");
-#
-#         // Assert
-#         let expected = "Hello, World!";
-#         assert_eq!(expected, actual);
-#     }
-# }
 ```
 
 If we run our tests, we should see it satisfies the new requirement and haven't accidentally broken the other functionality.
@@ -396,38 +288,11 @@ for further information visit https://rust-lang.github.io/rust-clippy/master/ind
 
 We can use the `is_empty` method, and do better by shadowing the `name` variable.
 
-```rust
-# const GREETING_PREFIX_FOR_ENGLISH: &str = "Hello, ";
-#
+```rust,ignore
 pub fn greet(name: &str) -> String {
     let name = if name.is_empty() { "World" } else { name };
     format!("{}{}!", GREETING_PREFIX_FOR_ENGLISH, name)
 }
-#
-# #[cfg(test)]
-# mod specs_for_greet {
-#     use super::greet;
-#
-#     #[test]
-#     fn sut_returns_hello_with_given_name_correctly() {
-#         // Act
-#         let actual = greet("Chris");
-#
-#         // Assert
-#         let expected = "Hello, Chris!";
-#         assert_eq!(expected, actual);
-#     }
-#
-#     #[test]
-#     fn sut_returns_hello_world_if_empty_name_is_given() {
-#         // Act
-#         let actual = greet("");
-#
-#         // Assert
-#         let expected = "Hello, World!";
-#         assert_eq!(expected, actual);
-#     }
-# }
 ```
 
 It is important that your tests are clear specifications of what the code needs to do. Refactoring is not just for the production code! Refactoring your tests is just as important. The tests for this example are very simple and no need to refactor, but as your tests get more complex, you will need to refactor them too. We will see more examples of this in the next chapters.
@@ -465,51 +330,19 @@ We should be confident that we can easily use TDD to flesh out this functionalit
 Write a test for a user passing in Spanish. Add it to the existing test suite.
 
 ```rust,ignore
-# const GREETING_PREFIX_FOR_ENGLISH: &str = "Hello, ";
-#
-# pub fn greet(name: &str) -> String {
-#     let name = if name.is_empty() { "World" } else { name };
-#     format!("{}{}!", GREETING_PREFIX_FOR_ENGLISH, name)
-# }
-#
-# [cfg(test)]
-# mod specs_for_greet {
-#     use super::greet;
-#
-#     #[test]
-#     fn sut_returns_hello_with_given_name_correctly() {
-#         // Act
-#         let actual = greet("Chris");
-#
-#         // Assert
-#         let expected = "Hello, Chris!";
-#         assert_eq!(expected, actual);
-#     }
-#
-#     #[test]
-#     fn sut_returns_hello_world_if_empty_name_is_given() {
-#         // Act
-#         let actual = greet("");
-#
-#         // Assert
-#         let expected = "Hello, World!";
-#         assert_eq!(expected, actual);
-#     }
-#
-    #[test]
-    fn sut_returns_hola_if_language_is_spanish() {
-        // Arrange
-        let name = "Elodie";
-        let language = "Spanish";
+#[test]
+fn sut_returns_hola_if_language_is_spanish() {
+    // Arrange
+    let name = "Elodie";
+    let language = "Spanish";
 
-        // Act
-        let actual = greet(name, language);
+    // Act
+    let actual = greet(name, language);
 
-        // Assert
-        let expected = "Hola, Elodie!";
-        assert_eq!(expected, actual);
-    }
-# }
+    // Assert
+    let expected = "Hola, Elodie!";
+    assert_eq!(expected, actual);
+}
 ```
 
 You might feel uncomfortable about the fact that you are not passing the second argument to `greet` function. But this is a good thing! It means you are following the TDD cycle and not trying to guess what the code should look like. You are letting the tests guide you.
@@ -527,51 +360,10 @@ error[E0061]: this function takes 1 argument but 2 arguments were supplied
 Fix the compilation problems by adding another string argument to `greet` function.
 
 ```rust,ignore
-# const GREETING_PREFIX_FOR_ENGLISH: &str = "Hello, ";
-#
 pub fn greet(name: &str, language: &str) -> String {
     let name = if name.is_empty() { "World" } else { name };
     format!("{}{}!", GREETING_PREFIX_FOR_ENGLISH, name)
 }
-#
-# [cfg(test)]
-# mod specs_for_greet {
-#     use super::greet;
-#
-#     #[test]
-#     fn sut_returns_hello_with_given_name_correctly() {
-#         // Act
-#         let actual = greet("Chris");
-#
-#         // Assert
-#         let expected = "Hello, Chris!";
-#         assert_eq!(expected, actual);
-#     }
-#
-#     #[test]
-#     fn sut_returns_hello_world_if_empty_name_is_given() {
-#         // Act
-#         let actual = greet("");
-#
-#         // Assert
-#         let expected = "Hello, World!";
-#         assert_eq!(expected, actual);
-#     }
-#
-#     #[test]
-#     fn sut_returns_hola_if_language_is_spanish() {
-#         // Arrange
-#         let name = "Elodie";
-#         let language = "Spanish";
-#
-#         // Act
-#         let actual = greet(name, language);
-#
-#         // Assert
-#         let expected = "Hola, Elodie!";
-#         assert_eq!(expected, actual);
-#     }
-# }
 ```
 
 When you try and run the test again it will complain about not passing through enough arguments to `greet` function in your other tests and in `main.rs`. Fix the tests and `main.rs` to pass the second argument as an empty string.
@@ -595,9 +387,7 @@ assertion `left == right` failed
 
 We can use `if` here to check the language is equal to "Spanish" as we did with `name`.
 
-```rust
-# const GREETING_PREFIX_FOR_ENGLISH: &str = "Hello, ";
-#
+```rust,ignore
 pub fn greet(name: &str, language: &str) -> String {
     let name = if name.is_empty() { "World" } else { name };
     let prefix = if language == "Spanish" {
@@ -607,53 +397,6 @@ pub fn greet(name: &str, language: &str) -> String {
     };
     format!("{}{}!", prefix, name)
 }
-#
-# #[cfg(test)]
-# mod specs_for_greet {
-#     use super::greet;
-#
-#     #[test]
-#     fn sut_returns_hello_with_given_name_correctly() {
-#         // Arrange
-#         let name = "Chris";
-#         let language = "";
-#
-#         // Act
-#         let actual = greet(name, language);
-#
-#         // Assert
-#         let expected = "Hello, Chris!";
-#         assert_eq!(expected, actual);
-#     }
-#
-#     #[test]
-#     fn sut_returns_hello_world_if_empty_name_is_given() {
-#         // Arrange
-#         let name = "";
-#         let language = "";
-#
-#         // Act
-#         let actual = greet(name, language);
-#
-#         // Assert
-#         let expected = "Hello, World!";
-#         assert_eq!(expected, actual);
-#     }
-#
-#     #[test]
-#     fn sut_returns_hola_if_language_is_spanish() {
-#         // Arrange
-#         let name = "Elodie";
-#         let language = "Spanish";
-#
-#         // Act
-#         let actual = greet(name, language);
-#
-#         // Assert
-#         let expected = "Hola, Elodie!";
-#         assert_eq!(expected, actual);
-#     }
-# }
 ```
 
 The tests should now pass.
@@ -674,117 +417,37 @@ pub fn greet(name: &str, language: &str) -> String {
     };
     format!("{}{}!", prefix, name)
 }
-#
-# #[cfg(test)]
-# mod specs_for_greet {
-#     use super::greet;
-#
-#     #[test]
-#     fn sut_returns_hello_with_given_name_correctly() {
-#         // Arrange
-#         let name = "Chris";
-#         let language = "";
-#
-#         // Act
-#         let actual = greet(name, language);
-#
-#         // Assert
-#         let expected = "Hello, Chris!";
-#         assert_eq!(expected, actual);
-#     }
-#
-#     #[test]
-#     fn sut_returns_hello_world_if_empty_name_is_given() {
-#         // Arrange
-#         let name = "";
-#         let language = "";
-#
-#         // Act
-#         let actual = greet(name, language);
-#
-#         // Assert
-#         let expected = "Hello, World!";
-#         assert_eq!(expected, actual);
-#     }
-#
-#     #[test]
-#     fn sut_returns_hola_if_language_is_spanish() {
-#         // Arrange
-#         let name = "Elodie";
-#         let language = "Spanish";
-#
-#         // Act
-#         let actual = greet(name, language);
-#
-#         // Assert
-#         let expected = "Hola, Elodie!";
-#         assert_eq!(expected, actual);
-#     }
-# }
 ```
 
 You should refactor tests as well because the name and intention of tests are not clear after introducing the language. You can change the test names to be more descriptive.
 
 ```rust
-# const SPANISH: &str = "Spanish";
-# const GREETING_PREFIX_FOR_ENGLISH: &str = "Hello, ";
-# const GREETING_PREFIX_FOR_SPANISH: &str = "Hola, ";
-#
-# pub fn greet(name: &str, language: &str) -> String {
-#     let name = if name.is_empty() { "World" } else { name };
-#     let prefix = if language == SPANISH {
-#         GREETING_PREFIX_FOR_SPANISH
-#     } else {
-#         GREETING_PREFIX_FOR_ENGLISH
-#     };
-#     format!("{}{}!", prefix, name)
-# }
-#
-# #[cfg(test)]
-# mod specs_for_greet {
-#     use super::greet;
-#
-    #[test]
-    fn sut_returns_hello_in_english_if_language_is_empty() {
-        // Arrange
-        let name = "Chris";
-        let language = "";
+#[test]
+fn sut_returns_hello_in_english_if_language_is_empty() {
+    // Arrange
+    let name = "Chris";
+    let language = "";
 
-        // Act
-        let actual = greet(name, language);
+    // Act
+    let actual = greet(name, language);
 
-        // Assert
-        let expected = "Hello, Chris!";
-        assert_eq!(expected, actual);
-    }
+    // Assert
+    let expected = "Hello, Chris!";
+    assert_eq!(expected, actual);
+}
 
-    #[test]
-    fn sut_returns_world_as_default_name_if_name_is_empty() {
-        // Arrange
-        let name = "";
-        let language = "";
+#[test]
+fn sut_returns_world_as_default_name_if_name_is_empty() {
+    // Arrange
+    let name = "";
+    let language = "";
 
-        // Act
-        let actual = greet(name, language);
+    // Act
+    let actual = greet(name, language);
 
-        // Assert
-        let expected = "Hello, World!";
-        assert_eq!(expected, actual);
-    }
-#
-#     #[test]
-#     fn sut_returns_hola_if_language_is_spanish() {
-#         // Arrange
-#         let name = "Elodie";
-#         let language = "Spanish";
-#
-#         // Act
-#         let actual = greet(name, language);
-#
-#         // Assert
-#         let expected = "Hola, Elodie!";
-#         assert_eq!(expected, actual);
-#     }
+    // Assert
+    let expected = "Hello, World!";
+    assert_eq!(expected, actual);
 }
 ```
 
@@ -818,67 +481,6 @@ pub fn greet(name: &str, language: &str) -> String {
     };
     format!("{}{}!", prefix, name)
 }
-#
-# #[cfg(test)]
-# mod specs_for_greet {
-#     use super::greet;
-#
-#     #[test]
-#     fn sut_returns_hello_in_english_if_language_is_empty() {
-#         // Arrange
-#         let name = "Chris";
-#         let language = "";
-#
-#         // Act
-#         let actual = greet(name, language);
-#
-#         // Assert
-#         let expected = "Hello, Chris!";
-#         assert_eq!(expected, actual);
-#     }
-#
-#     #[test]
-#     fn sut_returns_world_as_default_name_if_name_is_empty() {
-#         // Arrange
-#         let name = "";
-#         let language = "";
-#
-#         // Act
-#         let actual = greet(name, language);
-#
-#         // Assert
-#         let expected = "Hello, World!";
-#         assert_eq!(expected, actual);
-#     }
-#
-#     #[test]
-#     fn sut_returns_hola_if_language_is_spanish() {
-#         // Arrange
-#         let name = "Elodie";
-#         let language = "Spanish";
-#
-#         // Act
-#         let actual = greet(name, language);
-#
-#         // Assert
-#         let expected = "Hola, Elodie!";
-#         assert_eq!(expected, actual);
-#     }
-#
-#     #[test]
-#     fn sut_returns_bonjour_if_language_is_french() {
-#         // Arrange
-#         let name = "Arine";
-#         let language = "French";
-#
-#         // Act
-#         let actual = greet(name, language);
-#
-#         // Assert
-#         let expected = "Bonjour, Arine!";
-#         assert_eq!(expected, actual);
-#     }
-# }
 ```
 
 ## Two Last Refactoring
@@ -887,13 +489,7 @@ pub fn greet(name: &str, language: &str) -> String {
 
 When you have lots of if statements checking a particular value it is common to use a pattern matching instead. We can use `match` to refactor the code to make it easier to read and more extensible if we wish to add more language support later.
 
-```rust
-# const SPANISH: &str = "Spanish";
-# const FRENCH: &str = "French";
-# const GREETING_PREFIX_FOR_ENGLISH: &str = "Hello, ";
-# const GREETING_PREFIX_FOR_SPANISH: &str = "Hola, ";
-# const GREETING_PREFIX_FOR_FRENCH: &str = "Bonjour, ";
-#
+```rust,ignore
 pub fn greet(name: &str, language: &str) -> String {
     let name = if name.is_empty() { "World" } else { name };
     let prefix = match language {
@@ -903,67 +499,6 @@ pub fn greet(name: &str, language: &str) -> String {
     };
     format!("{}{}!", prefix, name)
 }
-#
-# #[cfg(test)]
-# mod specs_for_greet {
-#     use super::greet;
-#
-#     #[test]
-#     fn sut_returns_hello_in_english_if_language_is_empty() {
-#         // Arrange
-#         let name = "Chris";
-#         let language = "";
-#
-#         // Act
-#         let actual = greet(name, language);
-#
-#         // Assert
-#         let expected = "Hello, Chris!";
-#         assert_eq!(expected, actual);
-#     }
-#
-#     #[test]
-#     fn sut_returns_world_as_default_name_if_name_is_empty() {
-#         // Arrange
-#         let name = "";
-#         let language = "";
-#
-#         // Act
-#         let actual = greet(name, language);
-#
-#         // Assert
-#         let expected = "Hello, World!";
-#         assert_eq!(expected, actual);
-#     }
-#
-#     #[test]
-#     fn sut_returns_hola_if_language_is_spanish() {
-#         // Arrange
-#         let name = "Elodie";
-#         let language = "Spanish";
-#
-#         // Act
-#         let actual = greet(name, language);
-#
-#         // Assert
-#         let expected = "Hola, Elodie!";
-#         assert_eq!(expected, actual);
-#     }
-#
-#     #[test]
-#     fn sut_returns_bonjour_if_language_is_french() {
-#         // Arrange
-#         let name = "Arine";
-#         let language = "French";
-#
-#         // Act
-#         let actual = greet(name, language);
-#
-#         // Assert
-#         let expected = "Bonjour, Arine!";
-#         assert_eq!(expected, actual);
-#     }
-# }
 ```
 
 Write a test to now include a greeting in the language of your choice and you should see how simple it is to extend our amazing function.
@@ -972,13 +507,7 @@ Write a test to now include a greeting in the language of your choice and you sh
 
 You could argue that maybe our function is getting a little big. The simplest refactor for this would be to extract out some functionality into another function.
 
-```rust
-# const SPANISH: &str = "Spanish";
-# const FRENCH: &str = "French";
-# const GREETING_PREFIX_FOR_ENGLISH: &str = "Hello, ";
-# const GREETING_PREFIX_FOR_SPANISH: &str = "Hola, ";
-# const GREETING_PREFIX_FOR_FRENCH: &str = "Bonjour, ";
-#
+```rust,ignore
 pub fn greet(name: &str, language: &str) -> String {
     let name = if name.is_empty() { "World" } else { name };
     let prefix = determine_greeting_prefix(language);
@@ -992,67 +521,6 @@ fn determine_greeting_prefix(language: &str) -> &str {
         _ => GREETING_PREFIX_FOR_ENGLISH,
     }
 }
-#
-# #[cfg(test)]
-# mod specs_for_greet {
-#     use super::greet;
-#
-#     #[test]
-#     fn sut_returns_hello_in_english_if_language_is_empty() {
-#         // Arrange
-#         let name = "Chris";
-#         let language = "";
-#
-#         // Act
-#         let actual = greet(name, language);
-#
-#         // Assert
-#         let expected = "Hello, Chris!";
-#         assert_eq!(expected, actual);
-#     }
-#
-#     #[test]
-#     fn sut_returns_world_as_default_name_if_name_is_empty() {
-#         // Arrange
-#         let name = "";
-#         let language = "";
-#
-#         // Act
-#         let actual = greet(name, language);
-#
-#         // Assert
-#         let expected = "Hello, World!";
-#         assert_eq!(expected, actual);
-#     }
-#
-#     #[test]
-#     fn sut_returns_hola_if_language_is_spanish() {
-#         // Arrange
-#         let name = "Elodie";
-#         let language = "Spanish";
-#
-#         // Act
-#         let actual = greet(name, language);
-#
-#         // Assert
-#         let expected = "Hola, Elodie!";
-#         assert_eq!(expected, actual);
-#     }
-#
-#     #[test]
-#     fn sut_returns_bonjour_if_language_is_french() {
-#         // Arrange
-#         let name = "Arine";
-#         let language = "French";
-#
-#         // Act
-#         let actual = greet(name, language);
-#
-#         // Assert
-#         let expected = "Bonjour, Arine!";
-#         assert_eq!(expected, actual);
-#     }
-# }
 ```
 
 ## Wrapping Up

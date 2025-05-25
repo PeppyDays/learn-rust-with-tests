@@ -63,23 +63,6 @@ impl<const N: usize> From<[(String, String); N]> for Dictionary {
         Dictionary(HashMap::new())
     }
 }
-#
-# #[cfg(test)]
-# mod specs_for_dictionary_search {
-#     use super::Dictionary;
-#
-#     #[test]
-#     fn sut_returns_value_if_key_exists_correctly() {
-#         // Arrange
-#         let dictionary = Dictionary::from([("test".to_string(), "value".to_string())]);
-#
-#         // Act
-#         let actual = dictionary.search("test");
-#
-#         // Assert
-#         assert_eq!(actual, "value");
-#     }
-# }
 ```
 
 We implemented the `Dictionary` struct with [new type pattern](https://doc.rust-lang.org/book/ch20-02-advanced-traits.html#using-the-newtype-pattern-to-implement-external-traits-on-external-types) introduced in the [Errors](./errors.md) chapter.
@@ -116,23 +99,6 @@ impl<const N: usize> From<[(String, String); N]> for Dictionary {
         Dictionary(HashMap::from(entries))
     }
 }
-#
-# #[cfg(test)]
-# mod specs_for_dictionary_search {
-#     use super::Dictionary;
-#
-#     #[test]
-#     fn sut_returns_value_if_key_exists_correctly() {
-#         // Arrange
-#         let dictionary = Dictionary::new([("test".to_string(), "value".to_string())]);
-#
-#         // Act
-#         let actual = dictionary.search("test");
-#
-#         // Assert
-#         assert_eq!(actual, "value");
-#     }
-# }
 ```
 
 Now the test should pass as follows.
@@ -156,25 +122,6 @@ The basic search was very easy to implement, but what will happen if we supply a
 Let's write a test (and actually modify the previous one)!
 
 ```rust
-# use std::collections::HashMap;
-#
-# pub struct Dictionary(HashMap<String, String>);
-#
-# impl Dictionary {
-#     pub fn search(&self, key: &str) -> &str {
-#         match self.0.get(key) {
-#             Some(value) => value,
-#             None => panic!("not defined!"),
-#         }
-#     }
-# }
-#
-# impl<const N: usize> From<[(String, String); N]> for Dictionary {
-#     fn from(entries: [(String, String); N]) -> Self {
-#         Dictionary(HashMap::from(entries))
-#     }
-# }
-#
 #[cfg(test)]
 mod specs_for_dictionary_search {
     use super::Dictionary;
@@ -247,8 +194,6 @@ error[E0433]: failed to resolve: use of undeclared type `DictionaryError`
 ### Write the Minimal Amount of Code
 
 ```rust,ignore
-# use std::collections::HashMap;
-#
 #[derive(Default)]
 pub struct Dictionary(HashMap<String, String>);
 
@@ -264,49 +209,6 @@ impl Dictionary {
         }
     }
 }
-#
-# impl<const N: usize> From<[(String, String); N]> for Dictionary {
-#     fn from(entries: [(String, String); N]) -> Self {
-#         Dictionary(HashMap::from(entries))
-#     }
-# }
-#
-# #[derive(Debug, thiserror::Error)]
-# pub enum DictionaryError {
-#     #[error("")]
-#     NotFound(String),
-# }
-#
-# #[cfg(test)]
-# mod specs_for_dictionary_search {
-#     use super::Dictionary;
-#     use super::DictionaryError;
-#
-#     #[test]
-#     fn sut_returns_ok_with_value_if_key_exists_correctly() {
-#         // Arrange
-#         let dictionary = Dictionary::from([("test".to_string(), "value".to_string())]);
-#
-#         // Act
-#         let actual = dictionary.search("test").unwrap();
-#
-#         // Assert
-#         assert_eq!(actual, "value");
-#     }
-#
-#     #[test]
-#     fn sut_returns_not_found_error_if_key_does_not_exists() {
-#         // Arrange
-#         let dictionary = Dictionary::new();
-#
-#         // Act
-#         let actual = dictionary.search("test").unwrap_err();
-#
-#         // Assert
-#         assert!(matches!(actual, DictionaryError::NotFound(_)));
-#         assert_eq!(actual.to_string(), "the key 'test' was not found");
-#     }
-# }
 ```
 
 Our test should now fail with a much clearer error message.
@@ -321,8 +223,6 @@ Our test should now fail with a much clearer error message.
 ### Write Enough Code to Make It Pass
 
 ```rust,ignore
-# use std::collections::HashMap;
-#
 #[derive(Default)]
 pub struct Dictionary(HashMap<String, String>);
 
@@ -339,48 +239,11 @@ impl Dictionary {
     }
 }
 
-# impl<const N: usize> From<[(String, String); N]> for Dictionary {
-#     fn from(entries: [(String, String); N]) -> Self {
-#         Dictionary(HashMap::from(entries))
-#     }
-# }
-#
 #[derive(Debug, thiserror::Error)]
 pub enum DictionaryError {
     #[error("the key '{0}' was not found")]
     NotFound(String),
 }
-#
-# #[cfg(test)]
-# mod specs_for_dictionary_search {
-#     use super::Dictionary;
-#     use super::DictionaryError;
-#
-#     #[test]
-#     fn sut_returns_ok_with_value_if_key_exists_correctly() {
-#         // Arrange
-#         let dictionary = Dictionary::from([("test".to_string(), "value".to_string())]);
-#
-#         // Act
-#         let actual = dictionary.search("test").unwrap();
-#
-#         // Assert
-#         assert_eq!(actual, "value");
-#     }
-#
-#     #[test]
-#     fn sut_returns_not_found_error_if_key_does_not_exists() {
-#         // Arrange
-#         let dictionary = Dictionary::new();
-#
-#         // Act
-#         let actual = dictionary.search("test").unwrap_err();
-#
-#         // Assert
-#         assert!(matches!(actual, DictionaryError::NotFound(_)));
-#         assert_eq!(actual.to_string(), "the key 'test' was not found");
-#     }
-# }
 ```
 
 To make the tests pass, we implemented the `search` method to return a `Result` type. The `Result` type is an enum that can be either `Ok` or `Err`. We also created a new enum called `DictionaryError` to represent the error case. The `NotFound` variant of the enum takes a string as an argument, which is the key that was not found.
@@ -399,16 +262,11 @@ We can do the same thing with two chaining methods:
 Let's change the `search` method to use these methods.
 
 ```rust,ignore
-# use std::collections::HashMap;
-#
-# #[derive(Default)]
-# pub struct Dictionary(HashMap<String, String>);
-#
 impl Dictionary {
-#     pub fn new() -> Self {
-#         Dictionary::default()
-#     }
-#
+    pub fn new() -> Self {
+        Dictionary::default()
+    }
+
     pub fn search(&self, key: &str) -> Result<&str, DictionaryError> {
         self.0
             .get(key)
@@ -416,49 +274,6 @@ impl Dictionary {
             .ok_or_else(|| DictionaryError::NotFound(key.to_string()))
     }
 }
-#
-# impl<const N: usize> From<[(String, String); N]> for Dictionary {
-#     fn from(entries: [(String, String); N]) -> Self {
-#         Dictionary(HashMap::from(entries))
-#     }
-# }
-#
-# #[derive(Debug, thiserror::Error)]
-# pub enum DictionaryError {
-#     #[error("the key '{0}' was not found")]
-#     NotFound(String),
-# }
-#
-# #[cfg(test)]
-# mod specs_for_dictionary_search {
-#     use super::Dictionary;
-#     use super::DictionaryError;
-#
-#     #[test]
-#     fn sut_returns_ok_with_value_if_key_exists_correctly() {
-#         // Arrange
-#         let dictionary = Dictionary::from([("test".to_string(), "value".to_string())]);
-#
-#         // Act
-#         let actual = dictionary.search("test").unwrap();
-#
-#         // Assert
-#         assert_eq!(actual, "value");
-#     }
-#
-#     #[test]
-#     fn sut_returns_not_found_error_if_key_does_not_exists() {
-#         // Arrange
-#         let dictionary = Dictionary::new();
-#
-#         // Act
-#         let actual = dictionary.search("test").unwrap_err();
-#
-#         // Assert
-#         assert!(matches!(actual, DictionaryError::NotFound(_)));
-#         assert_eq!(actual.to_string(), "the key 'test' was not found");
-#     }
-# }
 ```
 
 You can do as you prefer. I just wanted to show you that there are several ways to do the same thing in Rust. The important thing is to understand the concepts and how to use them effectively.
@@ -472,36 +287,6 @@ We have a great way to search the dictionary. However, we have no way to add new
 In this test, we are utilizing our `search` function to make the validation of the dictionary a little easier.
 
 ```rust,ignore
-# use std::collections::HashMap;
-#
-# #[derive(Default)]
-# pub struct Dictionary(HashMap<String, String>);
-#
-# impl Dictionary {
-#     pub fn new() -> Self {
-#         Dictionary::default()
-#     }
-#
-#     pub fn search(&self, key: &str) -> Result<&str, DictionaryError> {
-#         self.0
-#             .get(key)
-#             .map(|value| value.as_str())
-#             .ok_or_else(|| DictionaryError::NotFound(key.to_string()))
-#     }
-# }
-#
-# impl<const N: usize> From<[(String, String); N]> for Dictionary {
-#     fn from(entries: [(String, String); N]) -> Self {
-#         Dictionary(HashMap::from(entries))
-#     }
-# }
-#
-# #[derive(Debug, thiserror::Error)]
-# pub enum DictionaryError {
-#     #[error("the key '{0}' was not found")]
-#     NotFound(String),
-# }
-#
 #[cfg(test)]
 mod specs_for_dictionary_add {
     use super::Dictionary;
@@ -524,55 +309,20 @@ mod specs_for_dictionary_add {
 ### Write the Minimal Amount of Code
 
 ```rust,ignore
-# use std::collections::HashMap;
-#
-# #[derive(Default)]
-# pub struct Dictionary(HashMap<String, String>);
-#
 impl Dictionary {
-#     pub fn new() -> Self {
-#         Dictionary::default()
-#     }
-#
-#     pub fn search(&self, key: &str) -> Result<&str, DictionaryError> {
-#         self.0
-#             .get(key)
-#             .map(|value| value.as_str())
-#             .ok_or_else(|| DictionaryError::NotFound(key.to_string()))
-#     }
-#
+    pub fn new() -> Self {
+        Dictionary::default()
+    }
+
+    pub fn search(&self, key: &str) -> Result<&str, DictionaryError> {
+        self.0
+            .get(key)
+            .map(|value| value.as_str())
+            .ok_or_else(|| DictionaryError::NotFound(key.to_string()))
+    }
+
     pub fn add(&mut self, key: String, value: String) {}
 }
-#
-# impl<const N: usize> From<[(String, String); N]> for Dictionary {
-#     fn from(entries: [(String, String); N]) -> Self {
-#         Dictionary(HashMap::from(entries))
-#     }
-# }
-#
-# #[derive(Debug, thiserror::Error)]
-# pub enum DictionaryError {
-#     #[error("the key '{0}' was not found")]
-#     NotFound(String),
-# }
-#
-# #[cfg(test)]
-# mod specs_for_dictionary_add {
-#     use super::Dictionary;
-#
-#     #[test]
-#     fn sut_adds_entry_to_be_able_to_search_it_later() {
-#         // Arrange
-#         let mut dictionary = Dictionary::new();
-#
-#         // Act
-#         dictionary.add("test".to_string(), "value".to_string());
-#
-#         // Assert
-#         let actual = dictionary.search("test").unwrap();
-#         assert_eq!("value", actual);
-#     }
-# }
 ```
 
 Now test should fail with a clear error message.
@@ -585,57 +335,22 @@ Now test should fail with a clear error message.
 ### Write Enough Code to Make It Pass
 
 ```rust,ignore
-# use std::collections::HashMap;
-#
-# #[derive(Default)]
-# pub struct Dictionary(HashMap<String, String>);
-#
 impl Dictionary {
-#     pub fn new() -> Self {
-#         Dictionary::default()
-#     }
-#
-#     pub fn search(&self, key: &str) -> Result<&str, DictionaryError> {
-#         self.0
-#             .get(key)
-#             .map(|value| value.as_str())
-#             .ok_or_else(|| DictionaryError::NotFound(key.to_string()))
-#     }
-#
+    pub fn new() -> Self {
+        Dictionary::default()
+    }
+
+    pub fn search(&self, key: &str) -> Result<&str, DictionaryError> {
+        self.0
+            .get(key)
+            .map(|value| value.as_str())
+            .ok_or_else(|| DictionaryError::NotFound(key.to_string()))
+    }
+
     pub fn add(&mut self, key: String, value: String) {
         self.0.insert(key, value);
     }
 }
-#
-# impl<const N: usize> From<[(String, String); N]> for Dictionary {
-#     fn from(entries: [(String, String); N]) -> Self {
-#         Dictionary(HashMap::from(entries))
-#     }
-# }
-#
-# #[derive(Debug, thiserror::Error)]
-# pub enum DictionaryError {
-#     #[error("the key '{0}' was not found")]
-#     NotFound(String),
-# }
-#
-# #[cfg(test)]
-# mod specs_for_dictionary_add {
-#     use super::Dictionary;
-#
-#     #[test]
-#     fn sut_adds_entry_to_be_able_to_search_it_later() {
-#         // Arrange
-#         let mut dictionary = Dictionary::new();
-#
-#         // Act
-#         dictionary.add("test".to_string(), "value".to_string());
-#
-#         // Assert
-#         let actual = dictionary.search("test").unwrap();
-#         assert_eq!("value", actual);
-#     }
-# }
 ```
 
 ### Refactor
@@ -649,40 +364,6 @@ What happens if we try to add an entry that already exists in the dictionary? Th
 ### Write the Test First
 
 ```rust,ignore
-# use std::collections::HashMap;
-#
-# #[derive(Default)]
-# pub struct Dictionary(HashMap<String, String>);
-#
-# impl Dictionary {
-#     pub fn new() -> Self {
-#         Dictionary::default()
-#     }
-#
-#     pub fn search(&self, key: &str) -> Result<&str, DictionaryError> {
-#         self.0
-#             .get(key)
-#             .map(|value| value.as_str())
-#             .ok_or_else(|| DictionaryError::NotFound(key.to_string()))
-#     }
-#
-#     pub fn add(&mut self, key: String, value: String) {
-#         self.0.insert(key, value);
-#     }
-# }
-#
-# impl<const N: usize> From<[(String, String); N]> for Dictionary {
-#     fn from(entries: [(String, String); N]) -> Self {
-#         Dictionary(HashMap::from(entries))
-#     }
-# }
-#
-# #[derive(Debug, thiserror::Error)]
-# pub enum DictionaryError {
-#     #[error("the key '{0}' was not found")]
-#     NotFound(String),
-# }
-#
 #[cfg(test)]
 mod specs_for_dictionary_add {
     use super::Dictionary;
@@ -740,79 +421,23 @@ error[E0599]: no method named `unwrap_err` found for unit type `()` in the curre
 ### Write the Minimal Amount of Code
 
 ```rust,ignore
-# use std::collections::HashMap;
-#
-# #[derive(Default)]
-# pub struct Dictionary(HashMap<String, String>);
-#
 impl Dictionary {
-#     pub fn new() -> Self {
-#         Dictionary::default()
-#     }
-#
-#     pub fn search(&self, key: &str) -> Result<&str, DictionaryError> {
-#         self.0
-#             .get(key)
-#             .map(|value| value.as_str())
-#             .ok_or_else(|| DictionaryError::NotFound(key.to_string()))
-#     }
-#
+    pub fn new() -> Self {
+        Dictionary::default()
+    }
+
+    pub fn search(&self, key: &str) -> Result<&str, DictionaryError> {
+        self.0
+            .get(key)
+            .map(|value| value.as_str())
+            .ok_or_else(|| DictionaryError::NotFound(key.to_string()))
+    }
+
     pub fn add(&mut self, key: String, value: String) -> Result<(), DictionaryError> {
         self.0.insert(key, value);
         Ok(())
     }
 }
-#
-# impl<const N: usize> From<[(String, String); N]> for Dictionary {
-#     fn from(entries: [(String, String); N]) -> Self {
-#         Dictionary(HashMap::from(entries))
-#     }
-# }
-#
-# #[derive(Debug, thiserror::Error)]
-# pub enum DictionaryError {
-#     #[error("the key '{0}' was not found")]
-#     NotFound(String),
-#
-#     #[error("the key '{0}' already exists")]
-#     AlreadyExists(String),
-# }
-#
-# #[cfg(test)]
-# mod specs_for_dictionary_add {
-#     use super::Dictionary;
-#     use super::DictionaryError;
-#
-#     #[test]
-#     fn sut_returns_ok_and_able_to_search_the_entry() {
-#         // Arrange
-#         let mut dictionary = Dictionary::new();
-#
-#         // Act
-#         dictionary
-#             .add("test".to_string(), "value".to_string())
-#             .unwrap();
-#
-#         // Assert
-#         let actual = dictionary.search("test").unwrap();
-#         assert_eq!("value", actual);
-#     }
-#
-#     #[test]
-#     fn sut_raises_already_exists_error_if_entry_already_exists() {
-#         // Arrange
-#         let mut dictionary = Dictionary::from([("test".to_string(), "value1".to_string())]);
-#
-#         // Act
-#         let actual = dictionary
-#             .add("test".to_string(), "value2".to_string())
-#             .unwrap_err();
-#
-#         // Assert
-#         assert!(matches!(actual, DictionaryError::AlreadyExists(_)));
-#         assert_eq!(actual.to_string(), "the key 'test' already exists");
-#     }
-# }
 ```
 
 Now we get a different error message.
@@ -826,23 +451,18 @@ Now we get a different error message.
 ### Write Enough Code to Make It Pass
 
 ```rust,ignore
-# use std::collections::HashMap;
-#
-# #[derive(Default)]
-# pub struct Dictionary(HashMap<String, String>);
-#
 impl Dictionary {
-#     pub fn new() -> Self {
-#         Dictionary::default()
-#     }
-#
-#     pub fn search(&self, key: &str) -> Result<&str, DictionaryError> {
-#         self.0
-#             .get(key)
-#             .map(|value| value.as_str())
-#             .ok_or_else(|| DictionaryError::NotFound(key.to_string()))
-#     }
-#
+    pub fn new() -> Self {
+        Dictionary::default()
+    }
+
+    pub fn search(&self, key: &str) -> Result<&str, DictionaryError> {
+        self.0
+            .get(key)
+            .map(|value| value.as_str())
+            .ok_or_else(|| DictionaryError::NotFound(key.to_string()))
+    }
+
     pub fn add(&mut self, key: String, value: String) -> Result<(), DictionaryError> {
         if self.0.contains_key(&key) {
             return Err(DictionaryError::AlreadyExists(key));
@@ -851,57 +471,6 @@ impl Dictionary {
         Ok(())
     }
 }
-#
-# impl<const N: usize> From<[(String, String); N]> for Dictionary {
-#     fn from(entries: [(String, String); N]) -> Self {
-#         Dictionary(HashMap::from(entries))
-#     }
-# }
-#
-# #[derive(Debug, thiserror::Error)]
-# pub enum DictionaryError {
-#     #[error("the key '{0}' was not found")]
-#     NotFound(String),
-#
-#     #[error("the key '{0}' already exists")]
-#     AlreadyExists(String),
-# }
-#
-# #[cfg(test)]
-# mod specs_for_dictionary_add {
-#     use super::Dictionary;
-#     use super::DictionaryError;
-#
-#     #[test]
-#     fn sut_returns_ok_and_able_to_search_the_entry() {
-#         // Arrange
-#         let mut dictionary = Dictionary::new();
-#
-#         // Act
-#         dictionary
-#             .add("test".to_string(), "value".to_string())
-#             .unwrap();
-#
-#         // Assert
-#         let actual = dictionary.search("test").unwrap();
-#         assert_eq!("value", actual);
-#     }
-#
-#     #[test]
-#     fn sut_raises_already_exists_error_if_entry_already_exists() {
-#         // Arrange
-#         let mut dictionary = Dictionary::from([("test".to_string(), "value1".to_string())]);
-#
-#         // Act
-#         let actual = dictionary
-#             .add("test".to_string(), "value2".to_string())
-#             .unwrap_err();
-#
-#         // Assert
-#         assert!(matches!(actual, DictionaryError::AlreadyExists(_)));
-#         assert_eq!(actual.to_string(), "the key 'test' already exists");
-#     }
-# }
 ```
 
 Here, we check if the key already exists in the dictionary with `contains_key` of `HashMap`. If it does, we return an error with `DictionaryError::AlreadyExists`. Otherwise, we insert the new entry into the dictionary.
@@ -911,23 +480,18 @@ Here, we check if the key already exists in the dictionary with `contains_key` o
 With the current `add` method, we access the internal `HashMap` twice. We can reduce it to once by using the `entry` method of `HashMap`. The `entry` method returns an `Entry` enum including `Occupied` and `Vacant`. If the entry is occupied, we can return an error. If it is vacant, we can insert the new value.
 
 ```rust,ignore
-# use std::collections::HashMap;
-#
-# #[derive(Default)]
-# pub struct Dictionary(HashMap<String, String>);
-#
 impl Dictionary {
-#     pub fn new() -> Self {
-#         Dictionary::default()
-#     }
-#
-#     pub fn search(&self, key: &str) -> Result<&str, DictionaryError> {
-#         self.0
-#             .get(key)
-#             .map(|value| value.as_str())
-#             .ok_or_else(|| DictionaryError::NotFound(key.to_string()))
-#     }
-#
+    pub fn new() -> Self {
+        Dictionary::default()
+    }
+
+    pub fn search(&self, key: &str) -> Result<&str, DictionaryError> {
+        self.0
+            .get(key)
+            .map(|value| value.as_str())
+            .ok_or_else(|| DictionaryError::NotFound(key.to_string()))
+    }
+
     pub fn add(&mut self, key: String, value: String) -> Result<(), DictionaryError> {
         match self.0.entry(key.clone()) {
             Entry::Occupied(_) => Err(DictionaryError::AlreadyExists(key)),
@@ -938,57 +502,6 @@ impl Dictionary {
         }
     }
 }
-#
-# impl<const N: usize> From<[(String, String); N]> for Dictionary {
-#     fn from(entries: [(String, String); N]) -> Self {
-#         Dictionary(HashMap::from(entries))
-#     }
-# }
-#
-# #[derive(Debug, thiserror::Error)]
-# pub enum DictionaryError {
-#     #[error("the key '{0}' was not found")]
-#     NotFound(String),
-#
-#     #[error("the key '{0}' already exists")]
-#     AlreadyExists(String),
-# }
-#
-# #[cfg(test)]
-# mod specs_for_dictionary_add {
-#     use super::Dictionary;
-#     use super::DictionaryError;
-#
-#     #[test]
-#     fn sut_returns_ok_and_able_to_search_the_entry() {
-#         // Arrange
-#         let mut dictionary = Dictionary::new();
-#
-#         // Act
-#         dictionary
-#             .add("test".to_string(), "value".to_string())
-#             .unwrap();
-#
-#         // Assert
-#         let actual = dictionary.search("test").unwrap();
-#         assert_eq!("value", actual);
-#     }
-#
-#     #[test]
-#     fn sut_raises_already_exists_error_if_entry_already_exists() {
-#         // Arrange
-#         let mut dictionary = Dictionary::from([("test".to_string(), "value1".to_string())]);
-#
-#         // Act
-#         let actual = dictionary
-#             .add("test".to_string(), "value2".to_string())
-#             .unwrap_err();
-#
-#         // Assert
-#         assert!(matches!(actual, DictionaryError::AlreadyExists(_)));
-#         assert_eq!(actual.to_string(), "the key 'test' already exists");
-#     }
-# }
 ```
 
 ## The Fifth Requirement: Dictionary Update Entry
@@ -1000,50 +513,6 @@ Let's update the entry in the dictionary. As we experienced, we have to care abo
 We're fully accustomed to this kind of situation, so let's write the two tests together.
 
 ```rust,ignore
-# use std::collections::HashMap;
-# use std::collections::hash_map::Entry;
-#
-# #[derive(Default)]
-# pub struct Dictionary(HashMap<String, String>);
-#
-# impl Dictionary {
-#     pub fn new() -> Self {
-#         Dictionary::default()
-#     }
-#
-#     pub fn search(&self, key: &str) -> Result<&str, DictionaryError> {
-#         self.0
-#             .get(key)
-#             .map(|value| value.as_str())
-#             .ok_or_else(|| DictionaryError::NotFound(key.to_string()))
-#     }
-#
-#     pub fn add(&mut self, key: String, value: String) -> Result<(), DictionaryError> {
-#         match self.0.entry(key.clone()) {
-#             Entry::Occupied(_) => Err(DictionaryError::AlreadyExists(key)),
-#             Entry::Vacant(entry) => {
-#                 entry.insert(value);
-#                 Ok(())
-#             }
-#         }
-#     }
-# }
-#
-# impl<const N: usize> From<[(String, String); N]> for Dictionary {
-#     fn from(entries: [(String, String); N]) -> Self {
-#         Dictionary(HashMap::from(entries))
-#     }
-# }
-#
-# #[derive(Debug, thiserror::Error)]
-# pub enum DictionaryError {
-#     #[error("the key '{0}' was not found")]
-#     NotFound(String),
-#
-#     #[error("the key '{0}' already exists")]
-#     AlreadyExists(String),
-# }
-#
 #[cfg(test)]
 mod specs_for_dictionary_update {
     use super::Dictionary;
@@ -1086,34 +555,28 @@ mod specs_for_dictionary_update {
 We can see that the compiler error happens because we don't have the `update` method in our `Dictionary` struct. The implementation of `update` method is similar to `add` method, so let's do this fast.
 
 ```rust,ignore
-# use std::collections::HashMap;
-# use std::collections::hash_map::Entry;
-#
-# #[derive(Default)]
-# pub struct Dictionary(HashMap<String, String>);
-#
 impl Dictionary {
-#     pub fn new() -> Self {
-#         Dictionary::default()
-#     }
-#
-#     pub fn search(&self, key: &str) -> Result<&str, DictionaryError> {
-#         self.0
-#             .get(key)
-#             .map(|value| value.as_str())
-#             .ok_or_else(|| DictionaryError::NotFound(key.to_string()))
-#     }
-#
-#     pub fn add(&mut self, key: String, value: String) -> Result<(), DictionaryError> {
-#         match self.0.entry(key.clone()) {
-#             Entry::Occupied(_) => Err(DictionaryError::AlreadyExists(key)),
-#             Entry::Vacant(entry) => {
-#                 entry.insert(value);
-#                 Ok(())
-#             }
-#         }
-#     }
-#
+    pub fn new() -> Self {
+        Dictionary::default()
+    }
+
+    pub fn search(&self, key: &str) -> Result<&str, DictionaryError> {
+        self.0
+            .get(key)
+            .map(|value| value.as_str())
+            .ok_or_else(|| DictionaryError::NotFound(key.to_string()))
+    }
+
+    pub fn add(&mut self, key: String, value: String) -> Result<(), DictionaryError> {
+        match self.0.entry(key.clone()) {
+            Entry::Occupied(_) => Err(DictionaryError::AlreadyExists(key)),
+            Entry::Vacant(entry) => {
+                entry.insert(value);
+                Ok(())
+            }
+        }
+    }
+
     pub fn update(&mut self, key: String, value: String) -> Result<(), DictionaryError> {
         match self.0.entry(key.clone()) {
             Entry::Occupied(mut entry) => {
@@ -1124,57 +587,6 @@ impl Dictionary {
         }
     }
 }
-#
-# impl<const N: usize> From<[(String, String); N]> for Dictionary {
-#     fn from(entries: [(String, String); N]) -> Self {
-#         Dictionary(HashMap::from(entries))
-#     }
-# }
-#
-# #[derive(Debug, thiserror::Error)]
-# pub enum DictionaryError {
-#     #[error("the key '{0}' was not found")]
-#     NotFound(String),
-#
-#     #[error("the key '{0}' already exists")]
-#     AlreadyExists(String),
-# }
-#
-# #[cfg(test)]
-# mod specs_for_dictionary_update {
-#     use super::Dictionary;
-#     use super::DictionaryError;
-#
-#     #[test]
-#     fn sut_returns_ok_and_the_value_is_updated_correctly() {
-#         // Arrange
-#         let mut dictionary = Dictionary::from([("test".to_string(), "value1".to_string())]);
-#
-#         // Act
-#         dictionary
-#             .update("test".to_string(), "value2".to_string())
-#             .unwrap();
-#
-#         // Assert
-#         let actual = dictionary.search("test").unwrap();
-#         assert_eq!("value2", actual);
-#     }
-#
-#     #[test]
-#     fn sut_returns_not_found_error_if_key_does_not_exists() {
-#         // Arrange
-#         let mut dictionary = Dictionary::new();
-#
-#         // Act
-#         let actual = dictionary
-#             .update("test".to_string(), "value".to_string())
-#             .unwrap_err();
-#
-#         // Assert
-#         assert!(matches!(actual, DictionaryError::NotFound(_)));
-#         assert_eq!(actual.to_string(), "the key 'test' was not found");
-#     }
-# }
 ```
 
 Easy peasy! Now we can run the test and see it pass.

@@ -47,23 +47,6 @@ Write enough code to satisfy the compiler and that's all - remember we want to c
 pub fn add(x: i64, y: i64) -> i64 {
     0
 }
-#
-# #[cfg(test)]
-# mod specs_for_add {
-#     #[test]
-#     fn sut_returns_4_if_arguments_are_2_and_2() {
-#         // Arrange
-#         let x = 2;
-#         let y = 2;
-#
-#         // Act
-#         let actual = add(x, y);
-#
-#         // Assert
-#         let expected = 4;
-#         assert_eq!(expected, actual);
-#     }
-# }
 ```
 
 Now run the tests, and we should be happy that the test is correctly reporting what is wrong.
@@ -83,25 +66,6 @@ In the strictest sense of TDD, we should now write the minimal amount of code to
 pub fn add(x: i64, y: i64) -> i64 {
     4
 }
-#
-# #[cfg(test)]
-# mod specs_for_add {
-#     use super::add;
-#
-#     #[test]
-#     fn sut_returns_4_if_arguments_are_2_and_2() {
-#         // Arrange
-#         let x = 2;
-#         let y = 2;
-#
-#         // Act
-#         let actual = add(x, y);
-#
-#         // Assert
-#         let expected = 4;
-#         assert_eq!(expected, actual);
-#     }
-# }
 ```
 
 Ah hah! Foiled again, TDD is a sham right?
@@ -116,25 +80,6 @@ For now, let's fix it properly
 pub fn add(x: i64, y: i64) -> i64 {
     x + y
 }
-#
-# #[cfg(test)]
-# mod specs_for_add {
-#     use super::add;
-#
-#     #[test]
-#     fn sut_returns_4_if_arguments_are_2_and_2() {
-#         // Arrange
-#         let x = 2;
-#         let y = 2;
-#
-#         // Act
-#         let actual = add(x, y);
-#
-#         // Assert
-#         let expected = 4;
-#         assert_eq!(expected, actual);
-#     }
-# }
 ```
 
 If you re-run the tests, they should pass.
@@ -150,25 +95,6 @@ You can add documentation comments to functions prefixed with `///` above the fu
 pub fn add(x: i64, y: i64) -> i64 {
     x + y
 }
-#
-# #[cfg(test)]
-# mod specs_for_add {
-#     use super::add;
-#
-#     #[test]
-#     fn sut_returns_4_if_arguments_are_2_and_2() {
-#         // Arrange
-#         let x = 2;
-#         let y = 2;
-#
-#         // Act
-#         let actual = add(x, y);
-#
-#         // Assert
-#         let expected = 4;
-#         assert_eq!(expected, actual);
-#     }
-# }
 ```
 
 ## Documentation Tests
@@ -181,7 +107,7 @@ Documentation tests are run whenever tests are executed. Because such examples a
 
 You can add documentation tests by adding a code block to the documentation comments. The code block should start and finish with ```. Here is an example:
 
-```rust
+````rust
 /// `add` takes two integers and returns the sum of them.
 ///
 /// ```
@@ -193,26 +119,7 @@ You can add documentation tests by adding a code block to the documentation comm
 pub fn add(x: i64, y: i64) -> i64 {
     x + y
 }
-#
-# #[cfg(test)]
-# mod specs_for_add {
-#     use super::add;
-#
-#     #[test]
-#     fn sut_returns_4_if_arguments_are_2_and_2() {
-#         // Arrange
-#         let x = 2;
-#         let y = 2;
-#
-#         // Act
-#         let actual = add(x, y);
-#
-#         // Assert
-#         let expected = 4;
-#         assert_eq!(expected, actual);
-#     }
-# }
-```
+````
 
 Adding this code will cause the example to appear in the documentation. The example will also be run as part of the tests, so if you change the code in the example, it will fail.
 
