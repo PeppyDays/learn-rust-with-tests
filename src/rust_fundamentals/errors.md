@@ -78,24 +78,6 @@ impl Wallet {
         0
     }
 }
-#
-# #[cfg(test)]
-# mod specs_for_wallet {
-#     use super::Wallet;
-#
-#     #[test]
-#     fn sut_deposits_correctly() {
-#         // Arrange
-#         let wallet = Wallet {};
-#
-#         // Act
-#         wallet.deposit(100);
-#         let actual = wallet.balance();
-#
-#         // Assert
-#         assert_eq!(100, actual);
-#     }
-# }
 ```
 
 Now we can run the test again and see the meaningful error message.
@@ -230,59 +212,20 @@ The requirement is for the wallet to be able to withdraw Bitcoin. Pretty much th
 ### Write the Test First
 
 ```rust
-# pub type BitCoin = u64;
-#
-# pub struct Wallet {
-#     balance: BitCoin,
-# }
-#
-# impl Wallet {
-#     pub fn open() -> Self {
-#         Self { balance: 0 }
-#     }
-#
-#     pub fn deposit(&mut self, amount: BitCoin) {
-#         self.balance += amount;
-#     }
-#
-#     pub fn balance(&self) -> BitCoin {
-#         self.balance
-#     }
-# }
-#
-# #[cfg(test)]
-# mod specs_for_wallet {
-#     use super::Wallet;
-#
-#     #[test]
-#     fn sut_deposits_correctly() {
-#         // Arrange
-#         let mut wallet = Wallet::open();
-#         let amount = 100;
-#
-#         // Act
-#         wallet.deposit(amount);
-#         let actual = wallet.balance();
-#
-#         // Assert
-#         assert_eq!(amount, actual);
-#     }
-#
-    #[test]
-    fn sut_withdraws_correctly() {
-        // Arrange
-        let mut wallet = Wallet::open();
-        wallet.deposit(20);
+#[test]
+fn sut_withdraws_correctly() {
+    // Arrange
+    let mut wallet = Wallet::open();
+    wallet.deposit(20);
 
-        // Act
-        wallet.withdraw(10);
-        let actual = wallet.balance();
+    // Act
+    wallet.withdraw(10);
+    let actual = wallet.balance();
 
-        // Assert
-        let expected = 10;
-        assert_eq!(expected, actual);
-    }
-# }
+    // Assert
+    let expected = 10;
+    assert_eq!(expected, actual);
+}
 ```
 
 ### Try to Run the Test
@@ -300,13 +243,7 @@ error[E0599]: no method named `withdraw` found for struct `Wallet` in the curren
 
 ### Write the Minimal Amount of Code
 
-```rust
-# pub type BitCoin = u64;
-#
-# pub struct Wallet {
-#     balance: BitCoin,
-# }
-#
+```rust,ignore
 impl Wallet {
     pub fn open() -> Self {
         Self { balance: 0 }
@@ -322,40 +259,6 @@ impl Wallet {
         self.balance
     }
 }
-#
-# #[cfg(test)]
-# mod specs_for_wallet {
-#     use super::Wallet;
-#
-#     #[test]
-#     fn sut_deposits_correctly() {
-#         // Arrange
-#         let mut wallet = Wallet::open();
-#         let amount = 100;
-#
-#         // Act
-#         wallet.deposit(amount);
-#         let actual = wallet.balance();
-#
-#         // Assert
-#         assert_eq!(amount, actual);
-#     }
-#
-#     #[test]
-#     fn sut_withdraws_correctly() {
-#         // Arrange
-#         let mut wallet = Wallet::open();
-#         wallet.deposit(20);
-#
-#         // Act
-#         wallet.withdraw(10);
-#         let actual = wallet.balance();
-#
-#         // Assert
-#         let expected = 10;
-#         assert_eq!(expected, actual);
-#     }
-# }
 ```
 
 ```bash
@@ -367,13 +270,7 @@ impl Wallet {
 
 ### Write Enough Code to Make It Pass
 
-```rust
-# pub type BitCoin = u64;
-#
-# pub struct Wallet {
-#     balance: BitCoin,
-# }
-#
+```rust,ignore
 impl Wallet {
     pub fn open() -> Self {
         Self { balance: 0 }
@@ -391,40 +288,6 @@ impl Wallet {
         self.balance
     }
 }
-#
-# #[cfg(test)]
-# mod specs_for_wallet {
-#     use super::Wallet;
-#
-#     #[test]
-#     fn sut_deposits_correctly() {
-#         // Arrange
-#         let mut wallet = Wallet::open();
-#         let amount = 100;
-#
-#         // Act
-#         wallet.deposit(amount);
-#         let actual = wallet.balance();
-#
-#         // Assert
-#         assert_eq!(amount, actual);
-#     }
-#
-#     #[test]
-#     fn sut_withdraws_correctly() {
-#         // Arrange
-#         let mut wallet = Wallet::open();
-#         wallet.deposit(20);
-#
-#         // Act
-#         wallet.withdraw(10);
-#         let actual = wallet.balance();
-#
-#         // Assert
-#         let expected = 10;
-#         assert_eq!(expected, actual);
-#     }
-# }
 ```
 
 ### Refactor
@@ -446,30 +309,6 @@ Let's try this out in a test.
 ### Write the Test First
 
 ```rust
-# pub type BitCoin = u64;
-#
-# pub struct Wallet {
-#     balance: BitCoin,
-# }
-#
-# impl Wallet {
-#     pub fn open() -> Self {
-#         Self { balance: 0 }
-#     }
-#
-#     pub fn deposit(&mut self, amount: BitCoin) {
-#         self.balance += amount;
-#     }
-#
-#     pub fn withdraw(&mut self, amount: BitCoin) {
-#         self.balance -= amount;
-#     }
-#
-#     pub fn balance(&self) -> BitCoin {
-#         self.balance
-#     }
-# }
-#
 #[cfg(test)]
 mod specs_for_wallet {
     use super::Wallet;
@@ -558,201 +397,25 @@ The wording is perhaps a little unclear, but our previous intent with `withdraw`
 
 ### Write the Minimal Amount of Code
 
-```rust
-# pub type BitCoin = u64;
-#
-# pub struct Wallet {
-#     balance: BitCoin,
-# }
-#
-# impl Wallet {
-#     pub fn open() -> Self {
-#         Self { balance: 0 }
-#     }
-#
-#     pub fn deposit(&mut self, amount: BitCoin) {
-#         self.balance += amount;
-#     }
-#
-    pub fn withdraw(&mut self, amount: BitCoin) -> Result<(), String> {
-        self.balance -= amount;
-        Ok(())
-    }
-#
-#     pub fn balance(&self) -> BitCoin {
-#         self.balance
-#     }
-# }
-#
-# #[cfg(test)]
-# mod specs_for_wallet {
-#     use rstest::rstest;
-#
-#     use super::BitCoin;
-#     use super::Wallet;
-#
-#     #[test]
-#     fn sut_deposits_correctly() {
-#         // Arrange
-#         let mut wallet = Wallet::open();
-#         let amount = 100;
-#
-#         // Act
-#         wallet.deposit(amount);
-#         let actual = wallet.balance();
-#
-#         // Assert
-#         assert_eq!(amount, actual);
-#     }
-#
-#     #[test]
-#     fn sut_withdraws_correctly() {
-#         // Arrange
-#         let mut wallet = Wallet::open();
-#         wallet.deposit(20);
-#
-#         // Act
-#         wallet.withdraw(10);
-#         let actual = wallet.balance();
-#
-#         // Assert
-#         let expected = 10;
-#         assert_eq!(expected, actual);
-#     }
-#
-#     #[rstest]
-#     #[case(20, 10)]
-#     #[case(20, 20)]
-#     fn sut_returns_ok_if_withdrawing_less_than_or_equal_balance(
-#         #[case] balance: BitCoin,
-#         #[case] amount: BitCoin,
-#     ) {
-#         // Arrange
-#         let mut wallet = Wallet::open();
-#         wallet.deposit(balance);
-#
-#         // Act
-#         let actual = wallet.withdraw(amount);
-#
-#         // Assert
-#         assert!(actual.is_ok());
-#     }
-#
-#     #[test]
-#     fn sut_returns_error_if_withdrawing_more_than_balance() {
-#         // Arrange
-#         let mut wallet = Wallet::open();
-#         wallet.deposit(20);
-#
-#         // Act
-#         let actual = wallet.withdraw(30);
-#
-#         // Assert
-#         assert!(actual.is_err());
-#     }
-# }
+```rust,ignore
+pub fn withdraw(&mut self, amount: BitCoin) -> Result<(), String> {
+    self.balance -= amount;
+    Ok(())
+}
 ```
 
 Again, it is very important to just write enough code to satisfy the compiler. We correct our `withdraw` method to return error and for now we have to return something so let's just return `Ok(())`.
 
 ### Write Enough Code to Make It Pass
 
-```rust
-# pub type BitCoin = u64;
-#
-# pub struct Wallet {
-#     balance: BitCoin,
-# }
-#
-# impl Wallet {
-#     pub fn open() -> Self {
-#         Self { balance: 0 }
-#     }
-#
-#     pub fn deposit(&mut self, amount: BitCoin) {
-#         self.balance += amount;
-#     }
-#
-    pub fn withdraw(&mut self, amount: BitCoin) -> Result<(), String> {
-        if amount > self.balance {
-            return Err(String::from("oh no"));
-        }
-        self.balance -= amount;
-        Ok(())
+```rust,ignore
+pub fn withdraw(&mut self, amount: BitCoin) -> Result<(), String> {
+    if amount > self.balance {
+        return Err(String::from("oh no"));
     }
-#
-#     pub fn balance(&self) -> BitCoin {
-#         self.balance
-#     }
-# }
-#
-# #[cfg(test)]
-# mod specs_for_wallet {
-#     use rstest::rstest;
-#
-#     use super::BitCoin;
-#     use super::Wallet;
-#
-#     #[test]
-#     fn sut_deposits_correctly() {
-#         // Arrange
-#         let mut wallet = Wallet::open();
-#         let amount = 100;
-#
-#         // Act
-#         wallet.deposit(amount);
-#         let actual = wallet.balance();
-#
-#         // Assert
-#         assert_eq!(amount, actual);
-#     }
-#
-#     #[test]
-#     fn sut_withdraws_correctly() {
-#         // Arrange
-#         let mut wallet = Wallet::open();
-#         wallet.deposit(20);
-#
-#         // Act
-#         wallet.withdraw(10);
-#         let actual = wallet.balance();
-#
-#         // Assert
-#         let expected = 10;
-#         assert_eq!(expected, actual);
-#     }
-#
-#     #[rstest]
-#     #[case(20, 10)]
-#     #[case(20, 20)]
-#     fn sut_returns_ok_if_withdrawing_less_than_or_equal_balance(
-#         #[case] balance: BitCoin,
-#         #[case] amount: BitCoin,
-#     ) {
-#         // Arrange
-#         let mut wallet = Wallet::open();
-#         wallet.deposit(balance);
-#
-#         // Act
-#         let actual = wallet.withdraw(amount);
-#
-#         // Assert
-#         assert!(actual.is_ok());
-#     }
-#
-#     #[test]
-#     fn sut_returns_error_if_withdrawing_more_than_balance() {
-#         // Arrange
-#         let mut wallet = Wallet::open();
-#         wallet.deposit(20);
-#
-#         // Act
-#         let actual = wallet.withdraw(30);
-#
-#         // Assert
-#         assert!(actual.is_err());
-#     }
-# }
+    self.balance -= amount;
+    Ok(())
+}
 ```
 
 ### Refactor
@@ -772,101 +435,20 @@ This is because we didn't handle the `Result` instance returned from `withdraw` 
 Let's fix this by using `let _ =` to ignore the result.
 
 ```rust
-# pub type BitCoin = u64;
-#
-# pub struct Wallet {
-#     balance: BitCoin,
-# }
-#
-# impl Wallet {
-#     pub fn open() -> Self {
-#         Self { balance: 0 }
-#     }
-#
-#     pub fn deposit(&mut self, amount: BitCoin) {
-#         self.balance += amount;
-#     }
-#
-#     pub fn withdraw(&mut self, amount: BitCoin) -> Result<(), String> {
-#         if amount > self.balance {
-#             return Err(String::from("oh no"));
-#         }
-#         self.balance -= amount;
-#         Ok(())
-#     }
-#
-#     pub fn balance(&self) -> BitCoin {
-#         self.balance
-#     }
-# }
-#
-# #[cfg(test)]
-# mod specs_for_wallet {
-#     use rstest::rstest;
-#
-#     use super::BitCoin;
-#     use super::Wallet;
-#
-#     #[test]
-#     fn sut_deposits_correctly() {
-#         // Arrange
-#         let mut wallet = Wallet::open();
-#         let amount = 100;
-#
-#         // Act
-#         wallet.deposit(amount);
-#         let actual = wallet.balance();
-#
-#         // Assert
-#         assert_eq!(amount, actual);
-#     }
-#
-    #[test]
-    fn sut_withdraws_correctly() {
-        // Arrange
-        let mut wallet = Wallet::open();
-        wallet.deposit(20);
+#[test]
+fn sut_withdraws_correctly() {
+    // Arrange
+    let mut wallet = Wallet::open();
+    wallet.deposit(20);
 
-        // Act
-        _ = wallet.withdraw(10);
-        let actual = wallet.balance();
+    // Act
+    _ = wallet.withdraw(10);
+    let actual = wallet.balance();
 
-        // Assert
-        let expected = 10;
-        assert_eq!(expected, actual);
-    }
-#
-#     #[rstest]
-#     #[case(20, 10)]
-#     #[case(20, 20)]
-#     fn sut_returns_ok_if_withdrawing_less_than_or_equal_balance(
-#         #[case] balance: BitCoin,
-#         #[case] amount: BitCoin,
-#     ) {
-#         // Arrange
-#         let mut wallet = Wallet::open();
-#         wallet.deposit(balance);
-#
-#         // Act
-#         let actual = wallet.withdraw(amount);
-#
-#         // Assert
-#         assert!(actual.is_ok());
-#     }
-#
-#     #[test]
-#     fn sut_returns_error_if_withdrawing_more_than_balance() {
-#         // Arrange
-#         let mut wallet = Wallet::open();
-#         wallet.deposit(20);
-#
-#         // Act
-#         let actual = wallet.withdraw(30);
-#
-#         // Assert
-#         assert!(actual.is_err());
-#     }
-# }
+    // Assert
+    let expected = 10;
+    assert_eq!(expected, actual);
+}
 ```
 
 ## The Fourth Requirement: Enhanced Error Reporting
@@ -882,102 +464,19 @@ There are several ways to define error types in Rust, and the most common way is
 Update the test `sut_returns_error_if_withdrawing_more_than_balance` to check the error type and message.
 
 ```rust
-# pub type BitCoin = u64;
-#
-# pub struct Wallet {
-#     balance: BitCoin,
-# }
-#
-# impl Wallet {
-#     pub fn open() -> Self {
-#         Self { balance: 0 }
-#     }
-#
-#     pub fn deposit(&mut self, amount: BitCoin) {
-#         self.balance += amount;
-#     }
-#
-#     pub fn withdraw(&mut self, amount: BitCoin) -> Result<(), String> {
-#         if amount > self.balance {
-#             return Err(String::from("oh no"));
-#         }
-#         self.balance -= amount;
-#         Ok(())
-#     }
-#
-#     pub fn balance(&self) -> BitCoin {
-#         self.balance
-#     }
-# }
-#
-# #[cfg(test)]
-# mod specs_for_wallet {
-#     use rstest::rstest;
-#
-#     use super::BitCoin;
-#     use super::Wallet;
-#
-#     #[test]
-#     fn sut_deposits_correctly() {
-#         // Arrange
-#         let mut wallet = Wallet::open();
-#         let amount = 100;
-#
-#         // Act
-#         wallet.deposit(amount);
-#         let actual = wallet.balance();
-#
-#         // Assert
-#         assert_eq!(amount, actual);
-#     }
-#
-#     #[test]
-#     fn sut_withdraws_correctly() {
-#         // Arrange
-#         let mut wallet = Wallet::open();
-#         wallet.deposit(20);
-#
-#         // Act
-#         _ = wallet.withdraw(10);
-#         let actual = wallet.balance();
-#
-#         // Assert
-#         let expected = 10;
-#         assert_eq!(expected, actual);
-#     }
-#
-#     #[rstest]
-#     #[case(20, 10)]
-#     #[case(20, 20)]
-#     fn sut_returns_ok_if_withdrawing_less_than_or_equal_balance(
-#         #[case] balance: BitCoin,
-#         #[case] amount: BitCoin,
-#     ) {
-#         // Arrange
-#         let mut wallet = Wallet::open();
-#         wallet.deposit(balance);
-#
-#         // Act
-#         let actual = wallet.withdraw(amount);
-#
-#         // Assert
-#         assert!(actual.is_ok());
-#     }
-#
-    #[test]
-    fn sut_returns_error_if_withdrawing_more_than_balance() {
-        // Arrange
-        let mut wallet = Wallet::open();
-        wallet.deposit(20);
+#[test]
+fn sut_returns_error_if_withdrawing_more_than_balance() {
+    // Arrange
+    let mut wallet = Wallet::open();
+    wallet.deposit(20);
 
-        // Act
-        let actual = wallet.withdraw(30).unwrap_err();
+    // Act
+    let actual = wallet.withdraw(30).unwrap_err();
 
-        // Assert
-        assert!(matches!(actual, WalletError::InsufficientFunds(_),));
-        assert_eq!(actual.to_string(), "cannot withdraw, insufficient funds");
-    }
-# }
+    // Assert
+    assert!(matches!(actual, WalletError::InsufficientFunds(_),));
+    assert_eq!(actual.to_string(), "cannot withdraw, insufficient funds");
+}
 ```
 
 In the test, we have used `wallet.withdraw(30).unwrap_err()` to get the error value from the `Result` type. If the `Result` is `Ok`, it will panic. If the `Result` is `Err`, it will return the error value. So the statement have two purposes: to assert that the result is error and to get the error value.
@@ -1002,21 +501,15 @@ help: consider importing this enum
 ### Write the Minimal Amount of Code
 
 ```rust,ignore
-# pub type BitCoin = u64;
-#
-# pub struct Wallet {
-#     balance: BitCoin,
-# }
-#
 impl Wallet {
-#     pub fn open() -> Self {
-#         Self { balance: 0 }
-#     }
-#
-#     pub fn deposit(&mut self, amount: BitCoin) {
-#         self.balance += amount;
-#     }
-#
+    pub fn open() -> Self {
+        Self { balance: 0 }
+    }
+
+    pub fn deposit(&mut self, amount: BitCoin) {
+        self.balance += amount;
+    }
+
     pub fn withdraw(&mut self, amount: BitCoin) -> Result<(), WalletError> {
         if amount > self.balance {
             return Err(WalletError::InsufficientFunds(String::from("oh no")));
@@ -1024,10 +517,10 @@ impl Wallet {
         self.balance -= amount;
         Ok(())
     }
-#
-#     pub fn balance(&self) -> BitCoin {
-#         self.balance
-#     }
+
+    pub fn balance(&self) -> BitCoin {
+        self.balance
+    }
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -1035,76 +528,6 @@ pub enum WalletError {
     #[error("{0}")]
     InsufficientFunds(String),
 }
-#
-# #[cfg(test)]
-# mod specs_for_wallet {
-#     use rstest::rstest;
-#
-#     use super::BitCoin;
-#     use super::Wallet;
-#     use super::WalletError;
-#
-#     #[test]
-#     fn sut_deposits_correctly() {
-#         // Arrange
-#         let mut wallet = Wallet::open();
-#         let amount = 100;
-#
-#         // Act
-#         wallet.deposit(amount);
-#         let actual = wallet.balance();
-#
-#         // Assert
-#         assert_eq!(amount, actual);
-#     }
-#
-#     #[test]
-#     fn sut_withdraws_correctly() {
-#         // Arrange
-#         let mut wallet = Wallet::open();
-#         wallet.deposit(20);
-#
-#         // Act
-#         _ = wallet.withdraw(10);
-#         let actual = wallet.balance();
-#
-#         // Assert
-#         let expected = 10;
-#         assert_eq!(expected, actual);
-#     }
-#
-#     #[rstest]
-#     #[case(20, 10)]
-#     #[case(20, 20)]
-#     fn sut_returns_ok_if_withdrawing_less_than_or_equal_balance(
-#         #[case] balance: BitCoin,
-#         #[case] amount: BitCoin,
-#     ) {
-#         // Arrange
-#         let mut wallet = Wallet::open();
-#         wallet.deposit(balance);
-#
-#         // Act
-#         let actual = wallet.withdraw(amount);
-#
-#         // Assert
-#         assert!(actual.is_ok());
-#     }
-#
-#     #[test]
-#     fn sut_returns_error_if_withdrawing_more_than_balance() {
-#         // Arrange
-#         let mut wallet = Wallet::open();
-#         wallet.deposit(20);
-#
-#         // Act
-#         let actual = wallet.withdraw(30).unwrap_err();
-#
-#         // Assert
-#         assert!(matches!(actual, WalletError::InsufficientFunds(_)));
-#         assert_eq!(actual.to_string(), "cannot withdraw, insufficient funds");
-#     }
-# }
 ```
 
 We declared an enum `WalletError` to represent the error types. We can declare the error as struct, but we choose enum because we would need to declare more errors in the future. For example, we might need to declare `InvalidAmountError` in the future. So we can use enum to represent multiple errors with a single type.
@@ -1136,21 +559,15 @@ Now the test shows the meaningful error message.
 ### Write Enough Code to Make It Pass
 
 ```rust,ignore
-# pub type BitCoin = u64;
-#
-# pub struct Wallet {
-#     balance: BitCoin,
-# }
-#
 impl Wallet {
-#     pub fn open() -> Self {
-#         Self { balance: 0 }
-#     }
-#
-#     pub fn deposit(&mut self, amount: BitCoin) {
-#         self.balance += amount;
-#     }
-#
+    pub fn open() -> Self {
+        Self { balance: 0 }
+    }
+
+    pub fn deposit(&mut self, amount: BitCoin) {
+        self.balance += amount;
+    }
+
     pub fn withdraw(&mut self, amount: BitCoin) -> Result<(), WalletError> {
         if amount > self.balance {
             return Err(WalletError::InsufficientFunds(String::from(
@@ -1160,87 +577,11 @@ impl Wallet {
         self.balance -= amount;
         Ok(())
     }
-#
-#     pub fn balance(&self) -> BitCoin {
-#         self.balance
-#     }
+
+    pub fn balance(&self) -> BitCoin {
+        self.balance
+    }
 }
-#
-# #[derive(Debug, thiserror::Error)]
-# pub enum WalletError {
-#     #[error("{0}")]
-#     InsufficientFunds(String),
-# }
-#
-# #[cfg(test)]
-# mod specs_for_wallet {
-#     use rstest::rstest;
-#
-#     use super::BitCoin;
-#     use super::Wallet;
-#     use super::WalletError;
-#
-#     #[test]
-#     fn sut_deposits_correctly() {
-#         // Arrange
-#         let mut wallet = Wallet::open();
-#         let amount = 100;
-#
-#         // Act
-#         wallet.deposit(amount);
-#         let actual = wallet.balance();
-#
-#         // Assert
-#         assert_eq!(amount, actual);
-#     }
-#
-#     #[test]
-#     fn sut_withdraws_correctly() {
-#         // Arrange
-#         let mut wallet = Wallet::open();
-#         wallet.deposit(20);
-#
-#         // Act
-#         _ = wallet.withdraw(10);
-#         let actual = wallet.balance();
-#
-#         // Assert
-#         let expected = 10;
-#         assert_eq!(expected, actual);
-#     }
-#
-#     #[rstest]
-#     #[case(20, 10)]
-#     #[case(20, 20)]
-#     fn sut_returns_ok_if_withdrawing_less_than_or_equal_balance(
-#         #[case] balance: BitCoin,
-#         #[case] amount: BitCoin,
-#     ) {
-#         // Arrange
-#         let mut wallet = Wallet::open();
-#         wallet.deposit(balance);
-#
-#         // Act
-#         let actual = wallet.withdraw(amount);
-#
-#         // Assert
-#         assert!(actual.is_ok());
-#     }
-#
-#     #[test]
-#     fn sut_returns_error_if_withdrawing_more_than_balance() {
-#         // Arrange
-#         let mut wallet = Wallet::open();
-#         wallet.deposit(20);
-#
-#         // Act
-#         let actual = wallet.withdraw(30).unwrap_err();
-#
-#         // Assert
-#         assert!(matches!(actual, WalletError::InsufficientFunds(_)));
-#         assert_eq!(actual.to_string(), "cannot withdraw, insufficient funds");
-#     }
-# }
 ```
 
 ### Refactor

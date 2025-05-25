@@ -44,24 +44,6 @@ Now we need to add a function `sum` to avoid the compilation error. We can do th
 pub fn sum(numbers: &[i32; 5]) -> i32 {
     0
 }
-#
-# #[cfg(test)]
-# mod specs_for_sum {
-#     use super::sum;
-#
-#     #[test]
-#     fn sut_returns_15_if_input_array_is_1_to_5() {
-#         // Arrange
-#         let numbers = [1, 2, 3, 4, 5];
-#
-#         // Act
-#         let actual = sum(&numbers);
-#
-#         // Assert
-#         let expected = 15;
-#         assert_eq!(expected, actual);
-#     }
-# }
 ```
 
 The input variable type `&[i32; 5]` means that it is a reference of an array of 5 integers. The `&` symbol indicates that we are passing a reference to the array, not the array itself. This is important because arrays in Rust have a fixed size, and passing them by value would require copying the entire array, which can be inefficient. And the `; 5` indicates the size of the array.
@@ -85,24 +67,6 @@ pub fn sum(numbers: &[i32; 5]) -> i32 {
     }
     total
 }
-#
-# #[cfg(test)]
-# mod specs_for_sum {
-#     use super::sum;
-#
-#     #[test]
-#     fn sut_returns_15_if_input_array_is_1_to_5() {
-#         // Arrange
-#         let numbers = [1, 2, 3, 4, 5];
-#
-#         // Act
-#         let actual = sum(&numbers);
-#
-#         // Assert
-#         let expected = 15;
-#         assert_eq!(expected, actual);
-#     }
-# }
 ```
 
 To get the value out of an array at a particular index, just use `array[index]` syntax. In this case, we are using `for` to iterate 5 times to work through the array, and add each item onto `total`.
@@ -119,24 +83,6 @@ pub fn sum(numbers: &[i32; 5]) -> i32 {
     }
     total
 }
-#
-# #[cfg(test)]
-# mod specs_for_sum {
-#     use super::sum;
-#
-#     #[test]
-#     fn sut_returns_15_if_input_array_is_1_to_5() {
-#         // Arrange
-#         let numbers = [1, 2, 3, 4, 5];
-#
-#         // Act
-#         let actual = sum(&numbers);
-#
-#         // Assert
-#         let expected = 15;
-#         assert_eq!(expected, actual);
-#     }
-# }
 ```
 
 `in` lets you iterate over an array. On each iteration, `number` will be set to the value of the current element in the array. This is a more idiomatic way to iterate over an array in Rust.
@@ -156,14 +102,6 @@ The next requirement will be to sum collections of varying sizes.
 We will now use the [slice type](https://doc.rust-lang.org/stable/book/ch04-03-slices.html) which allows us to have collections of any size. The syntax is very similar to arrays, you just omit the size when declaring them. `numbers: &[i32; 5]` rather than `numbers: &[i32]`.
 
 ```rust
-# pub fn sum(numbers: &[i32; 5]) -> i32 {
-#     let mut total = 0;
-#     for number in numbers {
-#         total += number;
-#     }
-#     total
-# }
-#
 #[cfg(test)]
 mod specs_for_sum {
     use super::sum;
@@ -227,37 +165,6 @@ pub fn sum(numbers: &[i32]) -> i32 {
     }
     total
 }
-#
-# #[cfg(test)]
-# mod specs_for_sum {
-#     use super::sum;
-#
-#     #[test]
-#     fn sut_returns_15_if_input_array_is_1_to_5() {
-#         // Arrange
-#         let numbers = [1, 2, 3, 4, 5];
-#
-#         // Act
-#         let actual = sum(&numbers);
-#
-#         // Assert
-#         let expected = 15;
-#         assert_eq!(expected, actual);
-#     }
-#
-#     #[test]
-#     fn sut_returns_6_if_input_array_is_1_to_3() {
-#         // Arrange
-#         let numbers = [1, 2, 3];
-#
-#         // Act
-#         let actual = sum(&numbers);
-#
-#         // Assert
-#         let expected = 6;
-#         assert_eq!(expected, actual);
-#     }
-# }
 ```
 
 If you try to run the tests, they will pass.
@@ -273,14 +180,6 @@ It turns out that fixing the compiler problems were all we need to do here, and 
 We already refactored the function. All we did was replace arrays with slices, so no extra changes are required. Remember that we must not neglect our test code in the refactoring stage. We can further improve our tests.
 
 ```rust
-# pub fn sum(numbers: &[i32]) -> i32 {
-#     let mut total = 0;
-#     for number in numbers {
-#         total += number;
-#     }
-#     total
-# }
-#
 #[cfg(test)]
 mod specs_for_sum {
     use super::sum;
@@ -458,19 +357,11 @@ assertion `left == right` failed
 Now we need to implement the `sum_all` function. We can use the `sum` function we created earlier to sum each array and return a new array with the results.
 
 ```rust,ignore
-# pub fn sum(numbers: &[i32]) -> i32 {
-#     let mut total = 0;
-#     for number in numbers {
-#         total += number;
-#     }
-#     total
-# }
-#
 pub fn sum_all<'a, 'b>(numbers_to_sum: &'a [&'a [i32]]) -> &'b [i32] {
     let length = numbers_to_sum.len();
     let mut sums = [0; length];
     for (i, numbers) in numbers_to_sum.iter().enumerate() {
-        sums[i] = sum(numbers);
+        sums[i] = sum(numbers);,ignore
     }
     &sums
 }
@@ -516,15 +407,7 @@ We can use a vector instead of an array. A vector is a growable collection type 
 
 Let's change the implementation of `sum_all` and its tests to use a vector instead of an array.
 
-```rust
-# pub fn sum(numbers: &[i32]) -> i32 {
-#     let mut total = 0;
-#     for number in numbers {
-#         total += number;
-#     }
-#     total
-# }
-#
+```rust,ignore
 pub fn sum_all(numbers_to_sum: &[&[i32]]) -> Vec<i32> {
     let mut sums = Vec::new();
     for numbers in numbers_to_sum {
@@ -559,15 +442,7 @@ Finally, we can run the test and it should pass!
 
 As we discussed earlier, we can pre-allocate the vector with the size of the input slice if the size is known. This will help us avoid the overhead of resizing the vector as we add elements to it.
 
-```rust
-# pub fn sum(numbers: &[i32]) -> i32 {
-#     let mut total = 0;
-#     for number in numbers {
-#         total += number;
-#     }
-#     total
-# }
-#
+```rust,ignore
 pub fn sum_all(numbers_to_sum: &[&[i32]]) -> Vec<i32> {
     let mut sums = Vec::with_capacity(numbers_to_sum.len());
     for numbers in numbers_to_sum {
@@ -575,25 +450,6 @@ pub fn sum_all(numbers_to_sum: &[&[i32]]) -> Vec<i32> {
     }
     sums
 }
-#
-# #[cfg(test)]
-# mod specs_for_sum_all {
-#     use super::sum_all;
-#
-#     #[test]
-#     fn sut_returns_two_summed_up_elements_if_two_arrays_are_given() {
-#         // Arrange
-#         let numbers_1 = [1, 2];
-#         let numbers_2 = [0, 9];
-#
-#         // Act
-#         let actual = sum_all(&[&numbers_1, &numbers_2]);
-#
-#         // Assert
-#         let expected = vec![3, 9];
-#         assert_eq!(expected, actual);
-#     }
-# }
 ```
 
 ### Write More Tests
@@ -601,22 +457,6 @@ pub fn sum_all(numbers_to_sum: &[&[i32]]) -> Vec<i32> {
 Tests can be documentation to help others understand how to use your code. We wrote a test only for working with arrays or slices of integers, but it also works with vectors. If we think working with vectors matters, we can add a test for it.
 
 ```rust
-# pub fn sum(numbers: &[i32]) -> i32 {
-#     let mut total = 0;
-#     for number in numbers {
-#         total += number;
-#     }
-#     total
-# }
-#
-# pub fn sum_all(numbers_to_sum: &[&[i32]]) -> Vec<i32> {
-#     let mut sums = Vec::with_capacity(numbers_to_sum.len());
-#     for numbers in numbers_to_sum {
-#         sums.push(sum(numbers));
-#     }
-#     sums
-# }
-#
 #[cfg(test)]
 mod specs_for_sum_all {
     use super::sum_all;
@@ -691,36 +531,9 @@ error[E0432]: unresolved import `super::sum_all_tails`
 Add the function `sum_all_trails` to `lib.rs`:
 
 ```rust
-# pub fn sum(numbers: &[i32]) -> i32 {
-#     let mut total = 0;
-#     for number in numbers {
-#         total += number;
-#     }
-#     total
-# }
-#
 pub fn sum_all_tails(numbers_to_sum: &[&[i32]]) -> Vec<i32> {
     Vec::new()
 }
-#
-# #[cfg(test)]
-# mod specs_for_sum_all_tails {
-#     use super::sum_all_tails;
-#
-#     #[test]
-#     fn sut_returns_last_elements_in_vector_correctly() {
-#         // Arrange
-#         let numbers_1 = vec![1, 2, 3];
-#         let numbers_2 = vec![0, 9, 10];
-#
-#         // Act
-#         let actual = sum_all_tails(&[&numbers_1, &numbers_2]);
-#
-#         // Assert
-#         let expected = vec![5, 19];
-#         assert_eq!(expected, actual);
-#     }
-# }
 ```
 
 And re-run the tests. You should see the following error:
@@ -735,15 +548,7 @@ assertion `left == right` failed
 
 ### Write Enough Code to Make It Pass
 
-```rust
-# pub fn sum(numbers: &[i32]) -> i32 {
-#     let mut total = 0;
-#     for number in numbers {
-#         total += number;
-#     }
-#     total
-# }
-#
+```rust,ignore
 pub fn sum_all_tails(numbers_to_sum: &[&[i32]]) -> Vec<i32> {
     let mut sums = Vec::with_capacity(numbers_to_sum.len());
     for numbers in numbers_to_sum {
@@ -751,25 +556,6 @@ pub fn sum_all_tails(numbers_to_sum: &[&[i32]]) -> Vec<i32> {
     }
     sums
 }
-#
-# #[cfg(test)]
-# mod specs_for_sum_all_trails {
-#     use super::sum_all_tails;
-#
-#     #[test]
-#     fn sut_returns_last_elements_in_vector_correctly() {
-#         // Arrange
-#         let numbers_1 = vec![1, 2, 3];
-#         let numbers_2 = vec![0, 9, 10];
-#
-#         // Act
-#         let actual = sum_all_tails(&[&numbers_1, &numbers_2]);
-#
-#         // Assert
-#         let expected = vec![5, 19];
-#         assert_eq!(expected, actual);
-#     }
-# }
 ```
 
 Slices can be sliced! The syntax is `slice[low..high]`. If you omit the value on one of the sides of the `..`, it captures everything to that side of it. In our case, we are saying "take from 1 to the end" with `numbers[1..]`. You may wish to spend some time writing other tests around slices and experiment with the slice operator to get more familiar with it.
@@ -785,22 +571,6 @@ Just add a test for the case where the slice is empty.
 ### Write the Test First
 
 ```rust
-# pub fn sum(numbers: &[i32]) -> i32 {
-#     let mut total = 0;
-#     for number in numbers {
-#         total += number;
-#     }
-#     total
-# }
-#
-# pub fn sum_all_tails(numbers_to_sum: &[&[i32]]) -> Vec<i32> {
-#     let mut sums = Vec::with_capacity(numbers_to_sum.len());
-#     for numbers in numbers_to_sum {
-#         sums.push(sum(&numbers[1..]));
-#     }
-#     sums
-# }
-#
 #[cfg(test)]
 mod specs_for_sum_all_tails {
     use super::sum_all_tails;
@@ -848,15 +618,7 @@ Compile time errors are our friend because they help us write software that work
 
 ### Write Enough Code to Make It Pass
 
-```rust
-# pub fn sum(numbers: &[i32]) -> i32 {
-#     let mut total = 0;
-#     for number in numbers {
-#         total += number;
-#     }
-#     total
-# }
-#
+```rust,ignore
 pub fn sum_all_tails(numbers_to_sum: &[&[i32]]) -> Vec<i32> {
     let mut sums = Vec::with_capacity(numbers_to_sum.len());
     for numbers in numbers_to_sum {
@@ -868,39 +630,6 @@ pub fn sum_all_tails(numbers_to_sum: &[&[i32]]) -> Vec<i32> {
     }
     sums
 }
-#
-# #[cfg(test)]
-# mod specs_for_sum_all_tails {
-#     use super::sum_all_tails;
-#
-#     #[test]
-#     fn sut_returns_sum_of_each_collection_in_vector_correctly() {
-#         // Arrange
-#         let numbers_1 = vec![1, 2, 3];
-#         let numbers_2 = vec![0, 9, 10];
-#
-#         // Act
-#         let actual = sum_all_tails(&[&numbers_1, &numbers_2]);
-#
-#         // Assert
-#         let expected = vec![5, 19];
-#         assert_eq!(expected, actual);
-#     }
-#
-#     #[test]
-#     fn sut_sets_summed_value_as_0_for_empty_collection() {
-#         // Arrange
-#         let numbers_1 = vec![];
-#         let numbers_2 = vec![3, 4, 5];
-#
-#         // Act
-#         let actual = sum_all_tails(&[&numbers_1, &numbers_2]);
-#
-#         // Assert
-#         let expected = vec![0, 9];
-#         assert_eq!(expected, actual);
-#     }
-# }
 ```
 
 ### Refactor

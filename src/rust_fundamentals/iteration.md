@@ -46,24 +46,6 @@ Keep the discipline! You don't need to know anything new right now to make the t
 pub fn repeat(c: &str) -> String {
     String::from("")
 }
-#
-# #[cfg(test)]
-# mod specs_for_repeat {
-#     use super::repeat;
-#
-#     #[test]
-#     fn sut_repeats_given_argument_10_times() {
-#         // Arrange
-#         let input = "a";
-#
-#         // Act
-#         let actual = repeat(input);
-#
-#         // Assert
-#         let expected = "aaaaaaaaaa";
-#         assert_eq!(expected, actual);
-#     }
-# }
 ```
 
 Isn't it nice to know you already know enough Rust to write tests for some basic problems? This means you can now play with the production code as much as you like and know it's behaving as you'd hope.
@@ -89,24 +71,6 @@ pub fn repeat(c: &str) -> String {
     }
     repeated
 }
-#
-# #[cfg(test)]
-# mod specs_for_repeat {
-#     use super::repeat;
-#
-#     #[test]
-#     fn sut_repeats_given_argument_10_times() {
-#         // Arrange
-#         let input = "a";
-#
-#         // Act
-#         let actual = repeat(input);
-#
-#         // Assert
-#         let expected = "aaaaaaaaaa";
-#         assert_eq!(expected, actual);
-#     }
-# }
 ```
 
 Unlike other languages like C, Java, or JavaScript, there are no parentheses surrounding the three components of the for statement and the braces { } are always required.
@@ -129,24 +93,6 @@ pub fn repeat(c: &str) -> String {
     }
     repeated
 }
-#
-# #[cfg(test)]
-# mod specs_for_repeat {
-#     use super::repeat;
-#
-#     #[test]
-#     fn sut_repeats_given_argument_10_times() {
-#         // Arrange
-#         let input = "a";
-#
-#         // Act
-#         let actual = repeat(input);
-#
-#         // Assert
-#         let expected = "aaaaaaaaaa";
-#         assert_eq!(expected, actual);
-#     }
-# }
 ```
 
 ## Benchmarking
@@ -226,24 +172,6 @@ pub fn repeat(c: &str) -> String {
     }
     repeated
 }
-#
-# #[cfg(test)]
-# mod specs_for_repeat {
-#     use super::repeat;
-#
-#     #[test]
-#     fn sut_repeats_given_argument_10_times() {
-#         // Arrange
-#         let input = "a";
-#
-#         // Act
-#         let actual = repeat(input);
-#
-#         // Assert
-#         let expected = "aaaaaaaaaa";
-#         assert_eq!(expected, actual);
-#     }
-# }
 ```
 
 Now you can run the benchmark again with `cargo bench` command, and see the difference in performance.

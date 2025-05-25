@@ -81,23 +81,6 @@ Define `countdown` and try again.
 
 ```rust,ignore
 pub fn countdown(out: &mut dyn Write) {}
-#
-# #[cfg(test)]
-# mod specs_for_countdown {
-#     // use super::countdown;
-#
-#     #[test]
-#     fn sut_writes_3() {
-#         // Arrange
-#         let mut buffer = Vec::new();
-#
-#         // Act
-#         countdown(&mut buffer);
-#
-#         // Assert
-#         assert_eq!(String::from_utf8(buffer).unwrap(), "3");
-#     }
-# }
 ```
 
 ```bash
@@ -111,29 +94,10 @@ Perfect!
 
 ### Write Enough Code to Make It Pass
 
-```rust
-# use std::io::Write;
-#
+```rust,ignore
 pub fn countdown(out: &mut dyn Write) {
     out.write_all(b"3").unwrap();
 }
-#
-# #[cfg(test)]
-# mod specs_for_countdown {
-#     use super::countdown;
-#
-#     #[test]
-#     fn sut_writes_3() {
-#         // Arrangk
-#         let mut buffer = Vec::new();
-#
-#         // Act
-#         countdown(&mut buffer);
-#
-#         // Assert
-#         assert_eq!(String::from_utf8(buffer).unwrap(), "3");
-#     }
-# }
 ```
 
 We're using `write_all` to write the bytes to the buffer and `unwrap` to panic if it fails. `write_all` is a method on `Write`, and it is similar to `write` but it will keep writing until all the bytes are written or an error occurs. `b"3"` is a byte string literal, which is a string literal that is represented as a sequence of bytes. It is similar to a regular string literal, but it is prefixed with a `b` and the type of the string is `&[u8]` instead of `&str`.
@@ -167,12 +131,6 @@ Next, we can make it print 2, 1 and then "Go!".
 By investing in getting the overall plumbing working right, we can iterate on our solution safely and easily. We will no longer need to stop and re-run the program to be confident of it working as all the logic is tested.
 
 ```rust
-# use std::io::Write;
-#
-# pub fn countdown(out: &mut dyn Write) {
-#     out.write_all(b"3").unwrap();
-# }
-#
 #[cfg(test)]
 mod specs_for_countdown {
     use super::countdown;
@@ -204,34 +162,13 @@ mod specs_for_countdown {
 
 ### Write Enough Code to Make It Pass
 
-```rust
-# use std::io::Write;
-#
+```rust,ignore
 pub fn countdown(out: &mut dyn Write) {
     for i in (1..=3).rev() {
         out.write_all(format!("{}\n", i).as_bytes()).unwrap();
     }
     out.write_all(b"Go!").unwrap();
 }
-#
-# #[cfg(test)]
-# mod specs_for_countdown {
-#     use super::countdown;
-#
-#     #[test]
-#     fn sut_writes_3_2_1_go() {
-#         // Arrangk
-#         let mut buffer = Vec::new();
-#
-#         // Act
-#         countdown(&mut buffer);
-#
-#         // Assert
-#         let actual = String::from_utf8(buffer).unwrap();
-#         let expected = "3\n2\n1\nGo!";
-#         assert_eq!(expected, actual);
-#     }
-# }
 ```
 
 Use a `for` loop counting and `rev` to reverse the order. `format!` is a macro that formats the string and returns it as a `String`. `as_bytes()` converts the string to a byte slice, which is what `write_all` needs. Finally, send the string "Go!" to the buffer.
@@ -252,25 +189,6 @@ pub fn countdown(out: &mut dyn Write) {
     }
     out.write_all(FINAL_WORD.as_bytes()).unwrap();
 }
-#
-# #[cfg(test)]
-# mod specs_for_countdown {
-#     use super::countdown;
-#
-#     #[test]
-#     fn sut_writes_3_2_1_go() {
-#         // Arrange
-#         let mut buffer = Vec::new();
-#
-#         // Act
-#         countdown(&mut buffer);
-#
-#         // Assert
-#         let actual = String::from_utf8(buffer).unwrap();
-#         let expected = "3\n2\n1\nGo!";
-#         assert_eq!(expected, actual);
-#     }
-# }
 ```
 
 ## The Third Requirement: Wait a Second Between Each Line
@@ -327,14 +245,7 @@ I made a design decision that our `countdown` function would not be responsible 
 
 Now we need to make a mock of it for our tests to use.
 
-```rust
-# #[cfg(test)]
-# mod specs_for_countdown {
-#     use std::cell::RefCell;
-#
-#     use super::Sleeper;
-#     use super::countdown;
-#
+```rust,ignore
     struct SleeprSpy {
         calls: RefCell<usize>,
     }
@@ -344,21 +255,6 @@ Now we need to make a mock of it for our tests to use.
             *self.calls.borrow_mut() += 1;
         }
     }
-#
-#     #[test]
-#     fn sut_writes_3_2_1_go() {
-#         // Arrange
-#         let mut buffer = Vec::new();
-#
-#         // Act
-#         countdown(&mut buffer);
-#
-#         // Assert
-#         let actual = String::from_utf8(buffer).unwrap();
-#         let expected = "3\n2\n1\nGo!";
-#         assert_eq!(expected, actual);
-#     }
-# }
 ```
 
 Spies are a kind of mock which can record how a dependency is used. They can record the arguments sent in, how many times it has been called, etc. In our case, we're keeping track of how many times `sleep` is called so we can check it in our test.
@@ -366,19 +262,6 @@ Spies are a kind of mock which can record how a dependency is used. They can rec
 Update the tests to inject a dependency on our spy and assert that the sleep has been called 3 times.
 
 ```rust,ignore
-# use std::io::Write;
-#
-# const COUNTDOWN_START: usize = 3;
-# const FINAL_WORD: &str = "Go!";
-#
-# pub fn countdown(out: &mut dyn Write) {
-#     for i in (1..=COUNTDOWN_START).rev() {
-#         out.write_all(format!("{}\n", i).as_bytes()).unwrap();
-#         sleep(Duration::from_secs(1));
-#     }
-#     out.write_all(FINAL_WORD.as_bytes()).unwrap();
-# }
-#
 #[cfg(test)]
 mod specs_for_countdown {
     use std::cell::RefCell;
@@ -448,18 +331,7 @@ You will see an error message that function expects 1 argument but got 2.
 
 We need to update `countdown` to accept our `Sleeper` trait object.
 
-```rust
-# use std::io::Write;
-# use std::thread::sleep;
-# use std::time::Duration;
-#
-# const COUNTDOWN_START: usize = 3;
-# const FINAL_WORD: &str = "Go!";
-#
-# pub trait Sleeper {
-#     fn sleep(&self);
-# }
-#
+```rust,ignore
 pub fn countdown(out: &mut dyn Write, sleeper: &dyn Sleeper) {
     for i in (1..=COUNTDOWN_START).rev() {
         out.write_all(format!("{}\n", i).as_bytes()).unwrap();
@@ -467,60 +339,6 @@ pub fn countdown(out: &mut dyn Write, sleeper: &dyn Sleeper) {
     }
     out.write_all(FINAL_WORD.as_bytes()).unwrap();
 }
-#
-# #[cfg(test)]
-# mod specs_for_countdown {
-#     use std::cell::RefCell;
-#     use std::io::stdout;
-#
-#     use super::Sleeper;
-#     use super::countdown;
-#
-#     struct SleeprSpy {
-#         calls: RefCell<usize>,
-#     }
-#
-#     impl SleeprSpy {
-#         fn new() -> Self {
-#             SleeprSpy {
-#                 calls: RefCell::new(0),
-#             }
-#         }
-#     }
-#
-#     impl Sleeper for SleeprSpy {
-#         fn sleep(&self) {
-#             *self.calls.borrow_mut() += 1;
-#         }
-#     }
-#
-#     #[test]
-#     fn sut_writes_3_2_1_go() {
-#         // Arrange
-#         let mut buffer = Vec::new();
-#         let sleeper_dummy = SleeprSpy::new();
-#
-#         // Act
-#         countdown(&mut buffer, &sleeper_dummy);
-#
-#         // Assert
-#         let actual = String::from_utf8(buffer).unwrap();
-#         let expected = "3\n2\n1\nGo!";
-#         assert_eq!(expected, actual);
-#     }
-#
-#     #[test]
-#     fn sut_calls_sleep_3_times() {
-#         // Arrange
-#         let sleeper_spy = SleeprSpy::new();
-#
-#         // Act
-#         countdown(&mut stdout(), &sleeper_spy);
-#
-#         // Assert
-#         assert_eq!(*sleeper_spy.calls.borrow(), 3);
-#     }
-# }
 ```
 
 If you try again, your `main` will no longer compile for the same reason. Let's create a real sleeper which implements the trait we need.
@@ -555,21 +373,6 @@ fn main() {
 The test is now compiling but not passing because we're still calling the time.Sleep rather than the injected in dependency. Let's fix that.
 
 ```rust,ignore
-# const COUNTDOWN_START: usize = 3;
-# const FINAL_WORD: &str = "Go!";
-#
-# pub trait Sleeper {
-#     fn sleep(&self);
-# }
-#
-# pub struct DefaultSleeper;
-#
-# impl Sleeper for DefaultSleeper {
-#     fn sleep(&self) {
-#         sleep(Duration::from_secs(1));
-#     }
-# }
-#
 pub fn countdown(out: &mut dyn Write, sleeper: &dyn Sleeper) {
     for i in (1..=COUNTDOWN_START).rev() {
         out.write_all(format!("{}\n", i).as_bytes()).unwrap();
@@ -577,60 +380,6 @@ pub fn countdown(out: &mut dyn Write, sleeper: &dyn Sleeper) {
     }
     out.write_all(FINAL_WORD.as_bytes()).unwrap();
 }
-#
-# #[cfg(test)]
-# mod specs_for_countdown {
-#     use std::cell::RefCell;
-#     use std::io::stdout;
-#
-#     use super::Sleeper;
-#     use super::countdown;
-#
-#     struct SleeprSpy {
-#         calls: RefCell<usize>,
-#     }
-#
-#     impl SleeprSpy {
-#         fn new() -> Self {
-#             SleeprSpy {
-#                 calls: RefCell::new(0),
-#             }
-#         }
-#     }
-#
-#     impl Sleeper for SleeprSpy {
-#         fn sleep(&self) {
-#             *self.calls.borrow_mut() += 1;
-#         }
-#     }
-#
-#     #[test]
-#     fn sut_writes_3_2_1_go() {
-#         // Arrange
-#         let mut buffer = Vec::new();
-#         let sleeper_dummy = SleeprSpy::new();
-#
-#         // Act
-#         countdown(&mut buffer, &sleeper_dummy);
-#
-#         // Assert
-#         let actual = String::from_utf8(buffer).unwrap();
-#         let expected = "3\n2\n1\nGo!";
-#         assert_eq!(expected, actual);
-#     }
-#
-#     #[test]
-#     fn sut_calls_sleep_3_times() {
-#         // Arrange
-#         let sleeper_spy = SleeprSpy::new();
-#
-#         // Act
-#         countdown(&mut stdout(), &sleeper_spy);
-#
-#         // Assert
-#         assert_eq!(*sleeper_spy.calls.borrow(), 3);
-#     }
-# }
 ```
 
 The test should pass and no longer take 3 seconds.
@@ -669,131 +418,47 @@ Let's use spying again with a new test to check the order of operations is corre
 We have two different dependencies and we want to record all of their operations into one list. So we'll create one spy for them both.
 
 ```rust,ignore
-# use std::io::Write;
-#
-# const COUNTDOWN_START: usize = 3;
-# const FINAL_WORD: &str = "Go!";
-#
-# pub trait Sleeper {
-#     fn sleep(&self);
-# }
-#
-# pub struct DefaultSleeper;
-#
-# impl Sleeper for DefaultSleeper {
-#     fn sleep(&self) {
-#         sleep(Duration::from_secs(1));
-#     }
-# }
-#
-# pub fn countdown(out: &mut dyn Write, sleeper: &dyn Sleeper) {
-#     for i in (1..=COUNTDOWN_START).rev() {
-#         out.write_all(format!("{}\n", i).as_bytes()).unwrap();
-#         sleeper.sleep();
-#     }
-#     out.write_all(FINAL_WORD.as_bytes()).unwrap();
-# }
-#
-#[cfg(test)]
-mod specs_for_countdown {
-    use std::cell::RefCell;
-    use std::io::Write;
-    use std::io::stdout;
-    use std::thread::sleep;
-    use std::time::Duration;
-    use std::time::SystemTime;
-    use std::time::UNIX_EPOCH;
+struct CountdownOperationsSpy {
+    sleep_command: &'static str,
+    write_command: &'static str,
+    calls: RefCell<Vec<(u128, &'static str)>>,
+}
 
-    use super::Sleeper;
-    use super::countdown;
-
-#     struct SleeprSpy {
-#         calls: RefCell<usize>,
-#     }
-#
-#     impl SleeprSpy {
-#         fn new() -> Self {
-#             SleeprSpy {
-#                 calls: RefCell::new(0),
-#             }
-#         }
-#     }
-#
-#     impl Sleeper for SleeprSpy {
-#         fn sleep(&self) {
-#             *self.calls.borrow_mut() += 1;
-#         }
-#     }
-#
-    struct CountdownOperationsSpy {
-        sleep_command: &'static str,
-        write_command: &'static str,
-        calls: RefCell<Vec<(u128, &'static str)>>,
-    }
-
-    impl CountdownOperationsSpy {
-        fn new() -> Self {
-            CountdownOperationsSpy {
-                sleep_command: "sleep",
-                write_command: "write",
-                calls: RefCell::new(Vec::new()),
-            }
+impl CountdownOperationsSpy {
+    fn new() -> Self {
+        CountdownOperationsSpy {
+            sleep_command: "sleep",
+            write_command: "write",
+            calls: RefCell::new(Vec::new()),
         }
     }
+}
 
-    impl Sleeper for CountdownOperationsSpy {
-        fn sleep(&self) {
-            let mut calls = self.calls.borrow_mut();
-            calls.push((get_current_timestamp(), self.sleep_command));
-            sleep(Duration::from_millis(1));
-        }
+impl Sleeper for CountdownOperationsSpy {
+    fn sleep(&self) {
+        let mut calls = self.calls.borrow_mut();
+        calls.push((get_current_timestamp(), self.sleep_command));
+        sleep(Duration::from_millis(1));
+    }
+}
+
+impl Write for CountdownOperationsSpy {
+    fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
+        let mut calls = self.calls.borrow_mut();
+        calls.push((get_current_timestamp(), self.write_command));
+        Ok(buf.len())
     }
 
-    impl Write for CountdownOperationsSpy {
-        fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
-            let mut calls = self.calls.borrow_mut();
-            calls.push((get_current_timestamp(), self.write_command));
-            Ok(buf.len())
-        }
-
-        fn flush(&mut self) -> std::io::Result<()> {
-            Ok(())
-        }
+    fn flush(&mut self) -> std::io::Result<()> {
+        Ok(())
     }
+}
 
-    fn get_current_timestamp() -> u128 {
-        SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .unwrap()
-            .as_nanos()
-    }
-#
-#     #[test]
-#     fn sut_writes_3_2_1_go() {
-#         // Arrange
-#         let mut buffer = Vec::new();
-#         let sleeper_dummy = SleeprSpy::new();
-#
-#         // Act
-#         countdown(&mut buffer, &sleeper_dummy);
-#
-#         // Assert
-#         let actual = String::from_utf8(buffer).unwrap();
-#         let expected = "3\n2\n1\nGo!";
-#         assert_eq!(expected, actual);
-#     }
-#
-#     #[test]
-#     fn sut_calls_sleep_3_times() {
-#         // Arrange
-#         let sleeper_spy = SleeprSpy::new();
-#
-#         // Act
-#         countdown(&mut stdout(), &sleeper_spy);
-#
-#         // Assert
-#         assert_eq!(*sleeper_spy.calls.borrow(), 3);
-#     }
+fn get_current_timestamp() -> u128 {
+    SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap()
+        .as_nanos()
 }
 ```
 
@@ -802,156 +467,29 @@ Our `CountdownOperationsSpy` implements both `Sleeper` and `Write`, recording ev
 We can now add a test into our test suite which verifies our sleeps and prints operate in the order we expect.
 
 ```rust,ignore
-# use std::io::Write;
-#
-# const COUNTDOWN_START: usize = 3;
-# const FINAL_WORD: &str = "Go!";
-#
-# pub trait Sleeper {
-#     fn sleep(&self);
-# }
-#
-# pub struct DefaultSleeper;
-#
-# impl Sleeper for DefaultSleeper {
-#     fn sleep(&self) {
-#         sleep(Duration::from_secs(1));
-#     }
-# }
-#
-# pub fn countdown(out: &mut dyn Write, sleeper: &dyn Sleeper) {
-#     for i in (1..=COUNTDOWN_START).rev() {
-#         out.write_all(format!("{}\n", i).as_bytes()).unwrap();
-#         sleeper.sleep();
-#     }
-#     out.write_all(FINAL_WORD.as_bytes()).unwrap();
-# }
-#
-# #[cfg(test)]
-# mod specs_for_countdown {
-#     use std::cell::RefCell;
-#     use std::io::Write;
-#     use std::io::stdout;
-#     use std::thread::sleep;
-#     use std::time::Duration;
-#     use std::time::SystemTime;
-#     use std::time::UNIX_EPOCH;
-#
-#     use super::Sleeper;
-#     use super::countdown;
-#
-#     struct SleeprSpy {
-#         calls: RefCell<usize>,
-#     }
-#
-#     impl SleeprSpy {
-#         fn new() -> Self {
-#             SleeprSpy {
-#                 calls: RefCell::new(0),
-#             }
-#         }
-#     }
-#
-#     impl Sleeper for SleeprSpy {
-#         fn sleep(&self) {
-#             *self.calls.borrow_mut() += 1;
-#         }
-#     }
-#
-#     struct CountdownOperationsSpy {
-#         sleep_command: &'static str,
-#         write_command: &'static str,
-#         calls: RefCell<Vec<(u128, &'static str)>>,
-#     }
-#
-#     impl CountdownOperationsSpy {
-#         fn new() -> Self {
-#             CountdownOperationsSpy {
-#                 sleep_command: "sleep",
-#                 write_command: "write",
-#                 calls: RefCell::new(Vec::new()),
-#             }
-#         }
-#     }
-#
-#     impl Sleeper for CountdownOperationsSpy {
-#         fn sleep(&self) {
-#             let mut calls = self.calls.borrow_mut();
-#             calls.push((get_current_timestamp(), self.sleep_command));
-#             sleep(Duration::from_millis(1));
-#         }
-#     }
-#
-#     impl Write for CountdownOperationsSpy {
-#         fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
-#             let mut calls = self.calls.borrow_mut();
-#             calls.push((get_current_timestamp(), self.write_command));
-#             Ok(buf.len())
-#         }
-#
-#         fn flush(&mut self) -> std::io::Result<()> {
-#             Ok(())
-#         }
-#     }
-#
-#     fn get_current_timestamp() -> u128 {
-#         SystemTime::now()
-#             .duration_since(UNIX_EPOCH)
-#             .unwrap()
-#             .as_nanos()
-#     }
-#
-#     #[test]
-#     fn sut_writes_3_2_1_go() {
-#         // Arrange
-#         let mut buffer = Vec::new();
-#         let sleeper_dummy = SleeprSpy::new();
-#
-#         // Act
-#         countdown(&mut buffer, &sleeper_dummy);
-#
-#         // Assert
-#         let actual = String::from_utf8(buffer).unwrap();
-#         let expected = "3\n2\n1\nGo!";
-#         assert_eq!(expected, actual);
-#     }
-#
-#     #[test]
-#     fn sut_calls_sleep_3_times() {
-#         // Arrange
-#         let sleeper_spy = SleeprSpy::new();
-#
-#         // Act
-#         countdown(&mut stdout(), &sleeper_spy);
-#
-#         // Assert
-#         assert_eq!(*sleeper_spy.calls.borrow(), 3);
-#     }
-#
-    #[test]
-    fn sut_sleeps_after_writing() {
-        // Arrange
-        let sleeper_spy = CountdownOperationsSpy::new();
-        let mut writer_spy = CountdownOperationsSpy::new();
+#[test]
+fn sut_sleeps_after_writing() {
+    // Arrange
+    let sleeper_spy = CountdownOperationsSpy::new();
+    let mut writer_spy = CountdownOperationsSpy::new();
 
-        // Act
-        countdown(&mut writer_spy, &sleeper_spy);
+    // Act
+    countdown(&mut writer_spy, &sleeper_spy);
 
-        // Assert
-        let merge_operations = |spy_1: CountdownOperationsSpy, spy_2: CountdownOperationsSpy| {
-            let mut operations = spy_1.calls.borrow_mut().clone();
-            operations.extend(spy_2.calls.borrow_mut().clone());
-            operations.sort_by_key(|key| key.0);
-            operations
-        };
-        let operations = merge_operations(writer_spy, sleeper_spy);
-        let actual: Vec<&str> = operations.into_iter().map(|(_, command)| command).collect();
-        let expected = vec![
-            "write", "sleep", "write", "sleep", "write", "sleep", "write",
-        ];
-        assert_eq!(expected, actual);
-    }
-# }
+    // Assert
+    let merge_operations = |spy_1: CountdownOperationsSpy, spy_2: CountdownOperationsSpy| {
+        let mut operations = spy_1.calls.borrow_mut().clone();
+        operations.extend(spy_2.calls.borrow_mut().clone());
+        operations.sort_by_key(|key| key.0);
+        operations
+    };
+    let operations = merge_operations(writer_spy, sleeper_spy);
+    let actual: Vec<&str> = operations.into_iter().map(|(_, command)| command).collect();
+    let expected = vec![
+        "write", "sleep", "write", "sleep", "write", "sleep", "write",
+    ];
+    assert_eq!(expected, actual);
+}
 ```
 
 This test should now fail. Revert `countdown` back to how it was to fix the test.
@@ -959,31 +497,6 @@ This test should now fail. Revert `countdown` back to how it was to fix the test
 We now have two tests spying on the `Sleeper`, so we can now refactor our test so one is testing what is being printed and the other one is ensuring we're sleeping between the prints. Finally, we can delete our first spy it is not used anymore.
 
 ```rust,ignore
-# use std::io::Write;
-#
-# const COUNTDOWN_START: usize = 3;
-# const FINAL_WORD: &str = "Go!";
-#
-# pub trait Sleeper {
-#     fn sleep(&self);
-# }
-#
-# pub struct DefaultSleeper;
-#
-# impl Sleeper for DefaultSleeper {
-#     fn sleep(&self) {
-#         sleep(Duration::from_secs(1));
-#     }
-# }
-#
-# pub fn countdown(out: &mut dyn Write, sleeper: &dyn Sleeper) {
-#     for i in (1..=COUNTDOWN_START).rev() {
-#         out.write_all(format!("{}\n", i).as_bytes()).unwrap();
-#         sleeper.sleep();
-#     }
-#     out.write_all(FINAL_WORD.as_bytes()).unwrap();
-# }
-#
 #[cfg(test)]
 mod specs_for_countdown {
     use std::cell::RefCell;
@@ -1132,38 +645,6 @@ In the `new` construction method, we are using `impl Fn(Duration) + 'static` to 
 Now we can add a test to check that the `ConfigurableSleeper.sleep` sends the correct duration to the sleep function by injecting a spy function.
 
 ```rust
-# use std::io::Write;
-# use std::time::Duration;
-#
-# const COUNTDOWN_START: usize = 3;
-# const FINAL_WORD: &str = "Go!";
-#
-# pub trait Sleeper {
-#     fn sleep(&self);
-# }
-#
-# pub struct ConfigurableSleeper {
-#     duration: Duration,
-#     sleep_function: Box<dyn Fn(Duration)>,
-# }
-#
-# impl ConfigurableSleeper {
-#     pub fn new(duration: Duration, sleep_function: impl Fn(Duration) + 'static) -> Self {
-#         ConfigurableSleeper {
-#             duration,
-#             sleep_function: Box::new(sleep_function),
-#         }
-#     }
-# }
-#
-# pub fn countdown(out: &mut dyn Write, sleeper: &dyn Sleeper) {
-#     for i in (1..=COUNTDOWN_START).rev() {
-#         out.write_all(format!("{}\n", i).as_bytes()).unwrap();
-#         sleeper.sleep();
-#     }
-#     out.write_all(FINAL_WORD.as_bytes()).unwrap();
-# }
-#
 #[cfg(test)]
 mod specs_for_configurable_sleeper {
     use std::cell::RefCell;
@@ -1201,70 +682,10 @@ To be honest, I couldn't write the test right away. I had to try several times t
 
 ### Write the Minimal Amount of Code
 
-```rust
-# use std::io::Write;
-# use std::time::Duration;
-#
-# const COUNTDOWN_START: usize = 3;
-# const FINAL_WORD: &str = "Go!";
-#
-# pub trait Sleeper {
-#     fn sleep(&self);
-# }
-#
-# pub struct ConfigurableSleeper {
-#     duration: Duration,
-#     sleep_function: Box<dyn Fn(Duration)>,
-# }
-#
-# impl ConfigurableSleeper {
-#     pub fn new(duration: Duration, sleep_function: impl Fn(Duration) + 'static) -> Self {
-#         ConfigurableSleeper {
-#             duration,
-#             sleep_function: Box::new(sleep_function),
-#         }
-#     }
-# }
-#
+```rust,ignore
 impl Sleeper for ConfigurableSleeper {
     fn sleep(&self) {}
 }
-#
-# pub fn countdown(out: &mut dyn Write, sleeper: &dyn Sleeper) {
-#     for i in (1..=COUNTDOWN_START).rev() {
-#         out.write_all(format!("{}\n", i).as_bytes()).unwrap();
-#         sleeper.sleep();
-#     }
-#     out.write_all(FINAL_WORD.as_bytes()).unwrap();
-# }
-#
-# #[cfg(test)]
-# mod specs_for_configurable_sleeper {
-#     use std::cell::RefCell;
-#     use std::rc::Rc;
-#     use std::time::Duration;
-#
-#     use super::ConfigurableSleeper;
-#     use super::Sleeper;
-#
-#     #[test]
-#     fn sut_delivers_duration_to_sleep_function_correctly() {
-#         // Arrange
-#         let recorder = Rc::new(RefCell::new(Duration::from_secs(0)));
-#         let duration_spy = recorder.clone();
-#         let sut = ConfigurableSleeper::new(Duration::from_secs(5), move |duration| {
-#             *duration_spy.borrow_mut() = duration;
-#         });
-#
-#         // Act
-#         sut.sleep();
-#
-#         // Assert
-#         let actual = recorder.take();
-#         let expected = Duration::from_secs(5);
-#         assert_eq!(expected, actual);
-#     }
-# }
 ```
 
 With our new `sleep` function implemented, we have a failing test.
@@ -1280,72 +701,12 @@ With our new `sleep` function implemented, we have a failing test.
 
 All we need to do now is implementing the `sleep` function for `ConfigurableSleeper`.
 
-```rust
-# use std::io::Write;
-# use std::time::Duration;
-#
-# const COUNTDOWN_START: usize = 3;
-# const FINAL_WORD: &str = "Go!";
-#
-# pub trait Sleeper {
-#     fn sleep(&self);
-# }
-#
-# pub struct ConfigurableSleeper {
-#     duration: Duration,
-#     sleep_function: Box<dyn Fn(Duration)>,
-# }
-#
-# impl ConfigurableSleeper {
-#     pub fn new(duration: Duration, sleep_function: impl Fn(Duration) + 'static) -> Self {
-#         ConfigurableSleeper {
-#             duration,
-#             sleep_function: Box::new(sleep_function),
-#         }
-#     }
-# }
-#
+```rust,ignore
 impl Sleeper for ConfigurableSleeper {
     fn sleep(&self) {
         (self.sleep_function)(self.duration);
     }
 }
-#
-# pub fn countdown(out: &mut dyn Write, sleeper: &dyn Sleeper) {
-#     for i in (1..=COUNTDOWN_START).rev() {
-#         out.write_all(format!("{}\n", i).as_bytes()).unwrap();
-#         sleeper.sleep();
-#     }
-#     out.write_all(FINAL_WORD.as_bytes()).unwrap();
-# }
-#
-# #[cfg(test)]
-# mod specs_for_configurable_sleeper {
-#     use std::cell::RefCell;
-#     use std::rc::Rc;
-#     use std::time::Duration;
-#
-#     use super::ConfigurableSleeper;
-#     use super::Sleeper;
-#
-#     #[test]
-#     fn sut_delivers_duration_to_sleep_function_correctly() {
-#         // Arrange
-#         let recorder = Rc::new(RefCell::new(Duration::from_secs(0)));
-#         let duration_spy = recorder.clone();
-#         let sut = ConfigurableSleeper::new(Duration::from_secs(5), move |duration| {
-#             *duration_spy.borrow_mut() = duration;
-#         });
-#
-#         // Act
-#         sut.sleep();
-#
-#         // Assert
-#         let actual = recorder.take();
-#         let expected = Duration::from_secs(5);
-#         assert_eq!(expected, actual);
-#     }
-# }
 ```
 
 With this change all of the tests should be passing again and you might wonder why all the hassle as the main program didn't change at all. Hopefully it becomes clear after the following section.
