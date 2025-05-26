@@ -18,6 +18,7 @@
 - [Dependency Injection](./rust_fundamentals/dependency_injection.md)
 - [Mocking](./rust_fundamentals/mocking.md)
 - [Concurrency](./rust_fundamentals/concurrency.md)
+- [Select](./rust_fundamentals/select.md)
 
 ---
 
