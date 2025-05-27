@@ -134,7 +134,7 @@ mod specs_for_sum {
 }
 ```
 
-### Try and Rust the Test
+### Try and Run the Test
 
 This does not compile because we are trying to pass an array of 3 integers into a function that expects an array of 5 integers. We need to change the function signature to accept a slice instead.
 
