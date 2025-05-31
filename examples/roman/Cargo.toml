@@ -1,0 +1,13 @@
+[package]
+name = "roman"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+
+[dev-dependencies]
+fake = "4"
+rstest = "0.25"
+rstest_reuse = "0.7"
+quickcheck = "1"
+quickcheck_macros = "1"
