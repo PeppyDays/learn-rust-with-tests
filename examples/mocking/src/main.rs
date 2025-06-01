@@ -2,8 +2,8 @@ use std::io::stdout;
 use std::thread::sleep;
 use std::time::Duration;
 
-use mocking::ConfigurableSleeper;
-use mocking::countdown;
+use mocking::v5::ConfigurableSleeper;
+use mocking::v5::countdown;
 
 fn main() {
     countdown(
