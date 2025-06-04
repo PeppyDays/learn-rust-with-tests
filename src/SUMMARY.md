@@ -20,6 +20,7 @@
 - [Concurrency](./rust_fundamentals/concurrency.md)
 - [Select](./rust_fundamentals/select.md)
 - [Property-based Tests](./rust_fundamentals/property_based_tests.md)
+- [Maths](./rust_fundamentals/math.md)
 
 ---
 
