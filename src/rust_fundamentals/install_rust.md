@@ -2,7 +2,7 @@
 
 ## Install rustup and Toolchains
 
-The official installation instructions for Rust are available [here](https://www.rust-lang.org/tools/install). After installing `rustup`, make sure to update it to the latest version and nightly toolchains:
+The official Rust installation guide is available [here](https://www.rust-lang.org/tools/install). After installing `rustup`, update to the latest stable version and install the nightly toolchain:
 
 ```bash
 rustup update stable
@@ -13,48 +13,48 @@ rustup toolchain install nightly
 
 ### Refactoring
 
-A big emphasis of this book is the importance of refactoring. Your tools can help you do bigger refactoring with confidence. You should be familiar enough with your editor to perform the following with a simple key combination:
+This book places a strong emphasis on refactoring. Your tools should enable you to perform large-scale refactoring with confidence. Master these essential operations with simple keyboard shortcuts:
 
-- Extract/Inline variable
-  - Taking magic values and giving them a name lets you simplify your code quickly
-- Extract method/function
-  - It is vital to be able to take a section of code and extract functions/methods
-- Rename symbols
-  - You should be able to rename symbols across files confidently
-- Format code
-  - Rust has a formatter called [rustfmt](https://github.com/rust-lang/rustfmt) that will format your code to a guided style
-  - Your editor should run this on every file saved
-- Lint code
-  - Rust has a linter called [clippy](https://github.com/rust-lang/rust-clippy) that will help you find common mistakes in your code
-  - Your editor should run this on every file saved
-- Run tests
-  - You should be able to do any of the above and then quickly re-run your tests to ensure your refactoring hasn't broken anything
+- **Extract/Inline variable**
+  - Transform magic values into named constants to simplify your code
+- **Extract method/function**
+  - Essential for breaking complex code into manageable functions
+- **Rename symbols**
+  - Confidently rename identifiers across your entire codebase
+- **Format code**
+  - [rustfmt](https://github.com/rust-lang/rustfmt) automatically formats your code according to Rust style guidelines
+  - Configure your editor to run this on save
+- **Lint code**
+  - [clippy](https://github.com/rust-lang/rust-clippy) catches common mistakes and suggests improvements
+  - Configure your editor to run this on save
+- **Run tests**
+  - Quickly verify that your refactoring hasn't broken functionality
 
-In addition, to help you work with your code, you should be able to:
+Additionally, your development environment should support:
 
-- View function signature
-  - You should never be unsure how to call a function in Rust
-  - Your IDE should describe a function in terms of its documentation, its parameters and what it returns
-- View function definition
-  - If it's still unclear what a function does, you should be able to jump to the source code and try and figure it out yourself
-- Find usages of a symbol
-  - Understanding a function's context can help you make decisions when refactoring
+- **View function signature**
+  - Never guess how to call a function
+  - Your IDE should display documentation, parameters, and return types
+- **View function definition**
+  - Jump to source code when you need deeper understanding
+- **Find usages of a symbol**
+  - Understand how code is used before refactoring
 
-Mastering your tools will help you concentrate on the code and reduce context switching.
+Mastering these tools helps you focus on writing code instead of fighting your environment.
 
 ### Tooling
 
-There are two options available for Rust IDE: [rust-analyzer](https://rust-analyzer.github.io/) and [RustRover](https://www.jetbrains.com/rust/). You can choose one of them based on your preference. Both of them are great tools for Rust development. I'm using Neovim with rust-analyzer, but I also have a RustRover installed. I use it for some of the more advanced refactoring features and debugging. You can use either of them, or both, depending on your needs.
+Two excellent IDE options are available for Rust development: [rust-analyzer](https://rust-analyzer.github.io/) and [RustRover](https://www.jetbrains.com/rust/). Choose based on your preferences - both provide comprehensive Rust support. I primarily use Neovim with rust-analyzer, but also keep RustRover installed for advanced refactoring and debugging tasks.
 
 #### rust-analyzer
 
-rust-analyzer is an implementation of the [language server protocol](https://microsoft.github.io/language-server-protocol/) for Rust. Any editors that support the language server protocol can use rust-analyzer. The most popular editors are:
+rust-analyzer implements the [Language Server Protocol](https://microsoft.github.io/language-server-protocol/) for Rust, making it compatible with any LSP-supporting editor. Popular choices include:
 
 - [Visual Studio Code](https://code.visualstudio.com/)
 - [Neovim](https://neovim.io/)
 - [Helix](https://helix-editor.com/)
 
-You can find all the detailed configuration for rust-analyzer [here](https://rust-analyzer.github.io/book/configuration.html), and this is personal rust-analyzer configuration in Neovim:
+Find detailed configuration options [here](https://rust-analyzer.github.io/book/configuration.html). Here's my personal rust-analyzer configuration for Neovim:
 
 ```json
 cargo = {
@@ -92,8 +92,8 @@ imports = {
 
 #### RustRover
 
-RustRover is a JetBrains IDE for Rust. It is a great option if you are already familiar with JetBrains IDEs. At the time of writing, it is free for non-commercial use. Also, it supports great features for refactoring, such as extractions, moving and renaming code, and more.
+RustRover is JetBrains' dedicated Rust IDE, perfect if you're already comfortable with their ecosystem. It's currently free for non-commercial use and excels at advanced refactoring operations like code extraction, moving modules, and intelligent renaming.
 
-## Wrapping up
+## Wrapping Up
 
-At this point, you should have Rust installed, an editor available, and some basic tooling in place. Rust has a very large ecosystem of third-party products. If you find some useful components, see [Awesome Rust](https://github.com/rust-unofficial/awesome-rust).
+You should now have Rust installed, a configured editor, and essential tooling ready. The Rust ecosystem offers many excellent third-party tools - explore [Awesome Rust](https://github.com/rust-unofficial/awesome-rust) to discover useful additions to your workflow.

@@ -4,7 +4,7 @@ You can find all the code for this chapter [here](https://github.com/PeppyDays/l
 
 It is assumed that you have read the [Structs, Methods and Traits](./structs_methods_and_traits.md) chapter before as some understanding of traits will be needed for this.
 
-There are a lot of misunderstandings around dependency injection around the programming community. Hopefully, this guide will show you how
+There are many misunderstandings about dependency injection in the programming community. Hopefully, this guide will show you how
 
 - You don't need a framework
 - It does not overcomplicate your design
@@ -27,7 +27,7 @@ But how can we test this? Calling `println!` prints to stdout, which is pretty h
 
 What we need to do is to be able to inject (which is just a fancy word for pass in) the dependency of printing.
 
-Our function doesn't need to care where or how the printing happens, so we should accept an interface rather than a concrete type.
+Our function doesn't need to care about where or how the printing happens, so we should accept an interface rather than a concrete type.
 
 If we do that, we can then change the implementation to print to something we control so that we can test it. In "real life" you would inject in something that writes to stdout.
 
@@ -116,11 +116,11 @@ impl Write for Stdout {
 }
 ```
 
-From this, we can infer that `Stdout` implements `Write`. And `println!` passes `Stdout` (as a functional form) to `print_to`, which then calls `write_fmt` on it.
+From this, we can infer that `Stdout` implements `Write`. The `println!` macro passes `Stdout` (in functional form) to `print_to`, which then calls `write_fmt` on it.
 
 `Write` is a trait that allows us to write bytes to a destination. It has a method `write` that takes a byte slice and returns the number of bytes written.
 
-As you write more Rust code, you will find this interface popping up a lot because it's a great general purpose trait for "putting this data somewhere".
+As you write more Rust code, you will find this interface appearing frequently because it's an excellent general-purpose trait for "putting this data somewhere".
 
 So we know under the covers we're ultimately using `Write` to send our greeting somewhere. Let's use this existing abstraction to make our code testable and more reusable.
 
@@ -149,7 +149,7 @@ mod specs_for_greet {
 
 We expect that the first argument of `greet` is a `Write` trait object. If any type implements `Write`, we can pass it to `greet`.
 
-We're writing the greeting to `Vec<u8>`, which is a byte vector. Byte array `&mut [u8]` implements `Write`, so `&mut Vec<u8>` implements `Write` as well due to the [deref coercion](https://doc.rust-lang.org/book/ch15-02-deref.html#implicit-deref-coercions-with-functions-and-methods). This means we can pass it to `greet` and it will work.
+We're writing the greeting to `Vec<u8>`, which is a byte vector. Since `&mut [u8]` implements `Write`, `&mut Vec<u8>` also implements `Write` due to [deref coercion](https://doc.rust-lang.org/book/ch15-02-deref.html#implicit-deref-coercions-with-functions-and-methods). This means we can pass it to `greet` and it will work.
 
 ### Try and Run the Test
 
@@ -205,9 +205,9 @@ Nothing to do here.
 
 ### Benefits of Dependency Injection
 
-Our first round of code was not easy to test because it wrote data to somewhere we couldn't control.
+Our first round of code was not easy to test because it wrote data to a location we couldn't control.
 
-Motivated by our tests we refactored the code so we could control where the data was written by injecting a dependency. Dependency injection enables us to do the followings.
+Motivated by our tests, we refactored the code so we could control where the data was written by injecting a dependency. Dependency injection enables us to do the following.
 
 #### Test our code
 
@@ -217,14 +217,14 @@ DI will motivate you to inject in a database dependency (via an interface) which
 
 #### Separate our concerns
 
-Decoupling where the data goes from how to generate it. If you ever feel like a method/function has too many responsibilities, e.g. generating data and writing to a db? handling HTTP requests and doing domain level logic?
+Decoupling where the data goes from how to generate it. If you ever feel like a method/function has too many responsibilities (e.g., generating data and writing to a database, or handling HTTP requests and performing domain-level logic), then
 
 DI is probably going to be the tool you need.
 
 #### Allow our code to be re-used in different contexts
 
-The first "new" context our code can be used in is inside tests. But further on if someone wants to try something new with your function they can inject their own dependencies.
+The first "new" context our code can be used in is inside tests. Later, if someone wants to try something new with your function, they can inject their own dependencies.
 
 ### What about Mocking?
 
-Mocking will be covered in detail later (and it's not evil). You use mocking to replace real things you inject with a pretend version that you can control and inspect in your tests. In our case though, the standard library had something ready for us to use.
+Mocking will be covered in detail later (and it's not evil). You use mocking to replace real dependencies with controlled versions that you can inspect in your tests. In our case, however, the standard library had something ready for us to use.

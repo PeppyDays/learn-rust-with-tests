@@ -2,7 +2,7 @@
 
 You can find all the code for this chapter [here](https://github.com/PeppyDays/learn-rust-with-tests/tree/main/examples/structs).
 
-Suppose that we need some geometry code to calculate the perimeter of a rectangle given a height and width. We can write a `Perimeter(width: f64, height: f64)` function, where `f64` is for floating-point numbers like 123.45.
+Suppose we need geometry code to calculate a rectangle's perimeter given height and width. We can write a `Perimeter(width: f64, height: f64)` function, where `f64` represents floating-point numbers like 123.45.
 
 The TDD cycle should be pretty familiar to you by now.
 
@@ -102,11 +102,11 @@ pub fn perimeter(width: f64, height: f64) -> f64 {
 # }
 ```
 
-So far, so easy. Now let's create a function called `area(width: f64, height: f64)` which returns the area of a rectangle.
+So far, so simple. Now let's create a function called `area(width: f64, height: f64)` that returns a rectangle's area.
 
-Try to do it by yourself, following the TDD cycle.
+Try this yourself, following the TDD cycle.
 
-You should end up with tests like this.
+You should end up with tests like this:
 
 ```rust
 pub fn perimeter(width: f64, height: f64) -> f64 {
@@ -158,9 +158,9 @@ mod specs_for_area {
 
 ### Refactor
 
-Our code does the job, but it doesn't contain anything explicit about rectangles. An unwary developer might try to supply the width and height of a triangle to these functions without realising they will return the wrong answer.
+Our code works, but contains nothing explicit about rectangles. An unwary developer might supply triangle width and height to these functions without realizing they'll return incorrect answers.
 
-We could just give the functions more specific names like `rectangle_area`. A neater solution is to define our own type called `Rectangle` which encapsulates this concept for us.
+We could use more specific names like `rectangle_area`. A cleaner solution is defining our own `Rectangle` type that encapsulates this concept.
 
 We can create a simple type using a **struct**. A [struct](https://doc.rust-lang.org/stable/book/ch05-01-defining-structs.html) is just a named collection of fields where you can store data.
 
@@ -306,7 +306,7 @@ pub fn area(rectangle: Rectangle) -> f64 {
 # }
 ```
 
-I hope you'll agree that passing a `Rectangle` to a function conveys our intent more clearly, but there are more benefits of using structs that we will cover later.
+Passing a `Rectangle` to a function conveys intent more clearly, and structs offer additional benefits we'll cover later.
 
 ## The Second Requirement: Perimeter and Area of a Circle
 
@@ -516,13 +516,13 @@ We have two choices:
 
 ### What are Methods?
 
-So far we have only been writing functions.
+So far we've only written functions.
 
-A method is a function with a receiver. A method declaration binds an identifier, the method name, to a method, and associates the method with the receiver's base type.
+A method is a function with a receiver. Method declarations bind an identifier (the method name) to a method and associate it with the receiver's base type.
 
-Methods are very similar to functions but they are called by invoking them on an instance of a particular type. Where you can just call functions wherever you like, such as `area(rectangle)` you can only call methods on "things".
+Methods are similar to functions but are called by invoking them on specific type instances. While you can call functions anywhere, like `area(rectangle)`, you can only call methods on "things".
 
-An example will help, so let's change our tests first to call methods instead and then fix the code.
+An example will help, so let's change our tests to call methods first, then fix the code.
 
 ```rust
 # pub struct Rectangle {
@@ -613,7 +613,7 @@ error[E0599]: no method named `area` found for struct `Circle` in the current sc
    |                             ^^^^ method not found in `Circle`
 ```
 
-I would like to reiterate how great the compiler is here. It is so important to take the time to slowly read the error messages you get, it will help you in the long run.
+The compiler is excellent here. Taking time to slowly read error messages will help you in the long run.
 
 ### Write the Minimal Amount of Code
 
@@ -703,9 +703,9 @@ impl Circle {
 # }
 ```
 
-The syntax for declaring methods is almost the same as functions and that's because they're so similar. Methods are declared inside an `impl` block, and the first argument is the receiver type `&self`. The `&` means that the method takes a reference to the receiver. The receiver type can be changed to `&mut self` or `self` depending on the context you want to pass in.
+Method declaration syntax nearly matches functions because they're so similar. Methods are declared inside `impl` blocks, with the first argument being the receiver type `&self`. The `&` means the method takes a reference to the receiver. The receiver type can be `&mut self` or `self` depending on the context you want.
 
-When your method is called on a variable of that type, you get your reference to its data via the `self` variable. In many other programming languages this is done implicitly and you access the receiver via this.
+When your method is called on a variable of that type, you access its data via the `self` variable. Many other programming languages do this implicitly, accessing the receiver via `this`.
 
 If you try to re-run the tests, they should now compile and give you some failing output.
 

@@ -2,13 +2,13 @@
 
 You can find all the code for this chapter [here](https://github.com/PeppyDays/learn-rust-with-tests/tree/main/examples/maps).
 
-In [Arrays and Slices](./arrays_and_slices.md), you saw how to store values in order. Now, we will look at a way to store items by a key and look them up quickly.
+In [Arrays and Slices](./arrays_and_slices.md), you learned to store values in ordered sequences. Now we'll explore storing items by key for efficient lookup.
 
 ## The First Requirement: Dictionary Search
 
-Maps allow you to store items in a manner similar to a dictionary. You can think of the key as the word and the value as the definition. And what better way is there to learn about Maps than to build our own dictionary?
+Maps store items like a dictionary - think of keys as words and values as definitions. What better way to learn maps than building our own dictionary?
 
-First, assuming we already have some words with their definitions in the dictionary, if we search for a word, it should return the definition of it.
+First, assuming we have words with definitions in our dictionary, searching for a word should return its corresponding definition.
 
 ### Write the Test First
 
@@ -31,19 +31,18 @@ mod specs_for_dictionary_search {
 }
 ```
 
-Now we added a test with a bit larger scope than as we did. With the test, we are trying to test three things:
-
-- The dictionary is a struct or new type, anything but we don't want to use map type directly
-- The dictionary is created correctly with seed entries
+This test has broader scope than previous examples. We're validating three things:
+- The dictionary is a struct or new type - we don't want to use the map type directly
+- The dictionary creates correctly with initial entries
 - The search method returns the correct value
 
-If we're not confident about this, we can create some tests for creating a dictionary first with small scope. After that, add search functionality tests.
+If this scope feels uncomfortable, we could create smaller tests for dictionary creation first, then add search functionality afterward.
 
-I'm pretty sure we're okay with this amount of scope. So let's keep going with it.
+However, this scope feels manageable, so let's proceed.
 
 ### Try to Run the Test
 
-By running the test, we will see an error message complaining about the missing `Dictionary` object and the `search` method.
+Running the test shows an error about the missing `Dictionary` object and `search` method.
 
 ### Write the Minimal Amount of Code
 
@@ -65,11 +64,11 @@ impl<const N: usize> From<[(String, String); N]> for Dictionary {
 }
 ```
 
-We implemented the `Dictionary` struct with [new type pattern](https://doc.rust-lang.org/book/ch20-02-advanced-traits.html#using-the-newtype-pattern-to-implement-external-traits-on-external-types) introduced in the [Errors](./errors.md) chapter.
+We implemented the `Dictionary` struct using the [new type pattern](https://doc.rust-lang.org/book/ch20-02-advanced-traits.html#using-the-newtype-pattern-to-implement-external-traits-on-external-types) introduced in the [Errors](./errors.md) chapter.
 
-We also implemented the `From` trait to create a dictionary from an array of tuples. The `From` trait is a standard library trait that allows you to convert one type into another. We can assume that constructing a new `Dictionary` with given entries is a conversion from the entries to `Dictionary`! `HashMap` does the same thing like [this](<https://doc.rust-lang.org/std/collections/struct.HashMap.html#impl-From%3C%5B(K,+V);+N%5D%3E-for-HashMap%3CK,+V%3E>).
+We also implemented the `From` trait to create a dictionary from an array of tuples. The `From` trait enables type conversion. We can consider constructing a new `Dictionary` with given entries as converting from entries to `Dictionary`. `HashMap` implements this same pattern [here](<https://doc.rust-lang.org/std/collections/struct.HashMap.html#impl-From%3C%5B(K,+V);+N%5D%3E-for-HashMap%3CK,+V%3E>).
 
-Our test should now fail with a clear error message.
+Our test should now fail with a clear error message:
 
 ```bash
     thread 'specs_for_dictionary_search::sut_returns_value_if_key_exists_correctly' panicked at src/lib.rs:35:9:
@@ -101,7 +100,7 @@ impl<const N: usize> From<[(String, String); N]> for Dictionary {
 }
 ```
 
-Now the test should pass as follows.
+The test should now pass:
 
 ```bash
  Nextest run ID f9955f9e-72f6-4269-94dc-437ad314e04a with nextest profile: default
@@ -111,15 +110,15 @@ Now the test should pass as follows.
 
 ### Refactor
 
-Nothing to refactor here, but `panic!` macro in `search` method is not a good idea. But, should we fix this right now? No! It just means we don't have enough specification written in tests to handle that kind of situation. So let's fix the specification for that situation, and add a test for that.
+Nothing to refactor here, but the `panic!` macro in the `search` method isn't ideal. Should we fix this now? No! It means we lack test specifications for that situation. Let's write specifications for that scenario by adding a test.
 
 ## The Second Requirement: Dictionary Search with Non-existing Entry
 
-The basic search was very easy to implement, but what will happen if we supply a word that's not in our dictionary? We actually panic the application. Obviously, this is not a good idea, and we should return an error instead.
+Basic search was straightforward, but what happens when we supply a word that's not in our dictionary? Currently, we panic the application. This is clearly not ideal - we should return an error instead.
 
 ### Write the Test First
 
-Let's write a test (and actually modify the previous one)!
+Let's write a test (and modify the previous one):
 
 ```rust
 #[cfg(test)]
@@ -153,19 +152,18 @@ mod specs_for_dictionary_search {
 }
 ```
 
-You can see several changes in the test:
-
-- New constructor `new` is added to create an empty dictionary
+Several changes are visible:
+- A new constructor `new` is added to create an empty dictionary
 - The `search` method now returns a `Result` type instead of `&str`
-  - The previous test is now changed to use `unwrap` method to get the value
-  - The new test is added to check the error case
-  - The error is `DictionaryError` enum
+  - The previous test now uses `unwrap` to get the value
+  - A new test checks the error case
+  - The error is a `DictionaryError` enum
 
-As I mentioned, it is a bit bigger changer than as we did. If you feel it's too large and uncomfortable, you can always break it down into smaller scopes and follow TDD workflow.
+As mentioned, this is a larger change than previous iterations. If it feels too large or uncomfortable, you can break it into smaller scopes and follow the TDD workflow.
 
 ### Try to Run the Test
 
-This does not compile.
+This doesn't compile:
 
 ```bash
 error[E0599]: no method named `unwrap` found for reference `&str` in the current scope
@@ -188,7 +186,6 @@ error[E0433]: failed to resolve: use of undeclared type `DictionaryError`
    |                                  |
    |                                  use of undeclared type `DictionaryError`
    |                                  help: a struct with a similar name exists: `Dictionary`
-
 ```
 
 ### Write the Minimal Amount of Code
@@ -211,7 +208,7 @@ impl Dictionary {
 }
 ```
 
-Our test should now fail with a much clearer error message.
+Our test should now fail with a clearer error message:
 
 ```bash
     thread 'specs_for_dictionary_search::sut_returns_not_found_error_if_key_does_not_exists' panicked at src/lib.rs:61:9:
@@ -246,20 +243,19 @@ pub enum DictionaryError {
 }
 ```
 
-To make the tests pass, we implemented the `search` method to return a `Result` type. The `Result` type is an enum that can be either `Ok` or `Err`. We also created a new enum called `DictionaryError` to represent the error case. The `NotFound` variant of the enum takes a string as an argument, which is the key that was not found.
+To make tests pass, we implemented the `search` method to return a `Result` type. The `Result` type is an enum that can be either `Ok` or `Err`. We also created a new enum called `DictionaryError` to represent error cases. The `NotFound` variant takes a string representing the key that wasn't found.
 
 ### Refactor
 
-It looks okay, but if you do like functional style programming, you can chain methods to make `Result` in `search` method.
+This looks good, but if you prefer functional-style programming, you can chain methods to create the `Result` in the `search` method.
 
-After getting a value from the internal `HashMap` with `self.0.get(key)`, you can get `Option<&String>` type. We changed from `Option<&String>` to `Result<&str, DictionaryError>` with pattern matching by splitting the `Option` type into two branches.
+After getting a value from the internal `HashMap` with `self.0.get(key)`, you receive an `Option<&String>` type. We converted from `Option<&String>` to `Result<&str, DictionaryError>` using pattern matching by splitting the `Option` type into two branches.
 
-We can do the same thing with two chaining methods:
-
+We can achieve the same result with two chained methods:
 - `ok_or_else` method to convert `Option<T>` to `Result<T, E>`
 - `map` method to convert `&String` to `&str`
 
-Let's change the `search` method to use these methods.
+Let's modify the `search` method to use these methods:
 
 ```rust,ignore
 impl Dictionary {
@@ -276,15 +272,15 @@ impl Dictionary {
 }
 ```
 
-You can do as you prefer. I just wanted to show you that there are several ways to do the same thing in Rust. The important thing is to understand the concepts and how to use them effectively.
+You can choose whichever approach you prefer. This demonstrates multiple ways to accomplish the same goal in Rust. The important thing is understanding the concepts and using them effectively.
 
 ## The Third Requirement: Dictionary Add Entry
 
-We have a great way to search the dictionary. However, we have no way to add new words to our dictionary.
+We have a great way to search the dictionary. However, we can't add new words to our dictionary.
 
 ### Write the Test First
 
-In this test, we are utilizing our `search` function to make the validation of the dictionary a little easier.
+In this test, we're utilizing our `search` function to make dictionary validation easier:
 
 ```rust,ignore
 #[cfg(test)]
@@ -325,7 +321,7 @@ impl Dictionary {
 }
 ```
 
-Now test should fail with a clear error message.
+The test should now fail with a clear error message:
 
 ```bash
     thread 'specs_for_dictionary_add::sut_adds_entry_to_be_able_to_search_it_later' panicked at src/lib.rs:49:48:
@@ -359,7 +355,7 @@ There isn't much to refactor in our implementation.
 
 ## The Fourth Requirement: Dictionary Add Entry Already Exists
 
-What happens if we try to add an entry that already exists in the dictionary? There could be many ways to handle this situation, such as overwriting or raising an error. Here, we raises an error if the entry already exists.
+What happens if we try to add an entry that already exists? There are many ways to handle this - overwriting or raising an error. Here, we'll raise an error if the entry already exists.
 
 ### Write the Test First
 
@@ -400,11 +396,11 @@ mod specs_for_dictionary_add {
 }
 ```
 
-For this test, we modified the previous test to check the result of `add` is `Ok` with `unwrap()`. We also added a new test to check the error case.
+For this test, we modified the previous test to check that `add` returns `Ok` using `unwrap()`. We also added a new test for the error case.
 
 ### Try to Run the Test
 
-The compiler will fail because we are not returning a value from the `add` method.
+The compiler fails because we're not returning a value from the `add` method:
 
 ```bash
 error[E0599]: no method named `unwrap_err` found for unit type `()` in the current scope
@@ -440,11 +436,10 @@ impl Dictionary {
 }
 ```
 
-Now we get a different error message.
+Now we get a different error message:
 
 ```bash
-    thread 'specs_for_dictionary_add::sut_raises_already_exists_error_if_entry_already_exists' panicked at src
-/lib.rs:72:14:
+    thread 'specs_for_dictionary_add::sut_raises_already_exists_error_if_entry_already_exists' panicked at src/lib.rs:72:14:
     called `Result::unwrap_err()` on an `Ok` value: ()
 ```
 
@@ -473,11 +468,11 @@ impl Dictionary {
 }
 ```
 
-Here, we check if the key already exists in the dictionary with `contains_key` of `HashMap`. If it does, we return an error with `DictionaryError::AlreadyExists`. Otherwise, we insert the new entry into the dictionary.
+Here, we check if the key already exists using `HashMap`'s `contains_key` method. If it does, we return an error with `DictionaryError::AlreadyExists`. Otherwise, we insert the new entry.
 
 ### Refactor
 
-With the current `add` method, we access the internal `HashMap` twice. We can reduce it to once by using the `entry` method of `HashMap`. The `entry` method returns an `Entry` enum including `Occupied` and `Vacant`. If the entry is occupied, we can return an error. If it is vacant, we can insert the new value.
+With the current `add` method, we access the internal `HashMap` twice. We can reduce this to once using the `entry` method. The `entry` method returns an `Entry` enum with `Occupied` and `Vacant` variants. If occupied, we return an error. If vacant, we insert the new value:
 
 ```rust,ignore
 impl Dictionary {
@@ -506,11 +501,11 @@ impl Dictionary {
 
 ## The Fifth Requirement: Dictionary Update Entry
 
-Let's update the entry in the dictionary. As we experienced, we have to care about two cases - the key exists or not. If it exists, we can update the value. If it does not exist, we should raise an error.
+Let's update an entry in the dictionary. We need to handle two cases: whether the key exists. If it exists, we update the value. If it doesn't exist, we raise an error.
 
 ### Write the Test First
 
-We're fully accustomed to this kind of situation, so let's write the two tests together.
+We're familiar with this situation, so let's write both tests together:
 
 ```rust,ignore
 #[cfg(test)]
@@ -552,7 +547,7 @@ mod specs_for_dictionary_update {
 
 ### Write Enough Code to Make It Pass
 
-We can see that the compiler error happens because we don't have the `update` method in our `Dictionary` struct. The implementation of `update` method is similar to `add` method, so let's do this fast.
+The compiler error occurs because we don't have the `update` method. The implementation is similar to the `add` method:
 
 ```rust,ignore
 impl Dictionary {
@@ -589,7 +584,7 @@ impl Dictionary {
 }
 ```
 
-Easy peasy! Now we can run the test and see it pass.
+Simple! Now we can run the test and see it pass:
 
 ```bash
  Nextest run ID eb8c9ea0-1c2b-45de-af7e-2784ea520e38 with nextest profile: default
@@ -602,24 +597,22 @@ Easy peasy! Now we can run the test and see it pass.
 
 ### Refactor
 
-Nothing to refactor here. The code is already clean and easy to read.
+Nothing to refactor here. The code is already clean and readable.
 
 ## The Sixth Requirement: Dictionary Remove Entry
 
-Now I believe you can do this by yourself. The `delete` method specification is as follows:
-
+You should now be able to implement this yourself. The `delete` method specification is:
 - If the key exists, remove the entry and return `Ok(())`
-- If the key does not exist, return `Err(DictionaryError::NotFound(key))`
+- If the key doesn't exist, return `Err(DictionaryError::NotFound(key))`
 
-You can check the code in the repository guided in the beginning of this chapter.
+You can check the code in the repository referenced at the beginning of this chapter.
 
 ## Wrapping Up
 
-In this section, we covered a lot. We made a full CRUD(Create, Read, Update and Delete) API for our dictionary. Throughout the process we learned how to:
-
-- Create a struct with new type pattern
-- Create `HashMap`
-- Search for items in `HashMap`
-- Add new items to `HashMap`
-- Update items in `HashMap`
-- Learned more about errors
+In this section, we covered significant ground. We built a full CRUD (Create, Read, Update, and Delete) API for our dictionary. Throughout the process, we learned how to:
+- Create a struct with the new type pattern
+- Create a `HashMap`
+- Search for items in a `HashMap`
+- Add new items to a `HashMap`
+- Update items in a `HashMap`
+- Work with errors in more detail

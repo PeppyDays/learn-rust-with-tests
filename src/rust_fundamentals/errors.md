@@ -2,13 +2,13 @@
 
 You can find all the code for this chapter [here](https://github.com/PeppyDays/learn-rust-with-tests/tree/main/examples/errors).
 
-We learned about structs in the last section which let us capture a number of values related around a concept.
+We learned about structs in the last section, which let us capture multiple values related to a concept.
 
-At some point you may wish to use structs to manage state, exposing methods to let users change the state in a way that you can control.
+You may eventually want to use structs to manage state, exposing methods that let users change state in controlled ways.
 
-Fintech loves Rust and uhhh bitcoins? So let's show what an amazing banking system we can make.
+Fintech loves Rust and Bitcoin! Let's demonstrate the amazing banking system we can build.
 
-Let's make a Wallet struct which lets us deposit Bitcoin.
+Let's create a Wallet struct that lets us deposit Bitcoin.
 
 ## The First Requirement: Deposit Bitcoin
 
@@ -42,15 +42,15 @@ error[E0422]: cannot find struct, variant or union type `Wallet` in this scope
   |                      ^^^^^^ not found in this scope
 ```
 
-In the [previous example](./structs_methods_and_traits.md) we accessed fields directly with the field name, however in our very secure wallet we don't want to expose our inner state to the rest of the world. We want to control access via methods.
+In the [previous example](./structs_methods_and_traits.md), we accessed fields directly with the field name. However, in our very secure wallet, we don't want to expose our inner state to the rest of the world. We want to control access via methods.
 
-We're good to run tests with a command `cargo test`, but we have another famous test platform called [nextest](https://nexte.st/) which is a drop-in replacement for the standard test framework. The main benefits of using nextest are:
+We can run tests with the command `cargo test`, but we have another popular test platform called [nextest](https://nexte.st/), which is a drop-in replacement for the standard test framework. The main benefits of using nextest are:
 
 - Faster test execution up to 3x, thanks to the parallelism described [here](https://nexte.st/docs/design/how-it-works/)
 - Better test output
 - Test subsets with filtering
 
-The first benefit is meaningful on TDD workflow. While following TDD workflow, we have to run tests in many times. As running tests faster, we can get feedback faster. So we can write code faster.
+The first benefit is meaningful in TDD workflow. While following TDD workflow, we have to run tests many times. By running tests faster, we can get feedback faster and therefore write code faster.
 
 We'll use nextest in this book for the following chapters. You can install it with the following command:
 
@@ -66,7 +66,7 @@ cargo nextest run
 
 ### Write the Minimal Amount of Code
 
-The compiler doesn't know what a Wallet is so let's tell it not to see the compiler error.
+The compiler doesn't know what a Wallet is, so let's define it to avoid the compiler error.
 
 ```rust
 pub struct Wallet {}
@@ -93,9 +93,9 @@ Now we can run the test again and see the meaningful error message.
 
 We will need some kind of balance variable in our struct to store the state.
 
-You might encounter some problems. The first one is that we need to make the `balance` field mutable in `deposit()` method. The second one is that we need to make the struct itself mutable in the test.
+You might encounter some problems. First, we need to make the `balance` field mutable in the `deposit()` method. Second, we need to make the struct itself mutable in the test.
 
-During writing a code, I also found that we can use a term `open` to create a new `Wallet` instance because we usually say `open an account` in the banking world. So I created a new method `open()` to create a new `Wallet` instance.
+While writing the code, I also realized that we can use the term `open` to create a new `Wallet` instance because we usually say "open an account" in the banking world. So I created a new method `open()` to create a new `Wallet` instance.
 
 ```rust
 pub struct Wallet {
@@ -149,11 +149,11 @@ Now, run the test again and see the result.
 
 ### Refactor
 
-We said we were making a Bitcoin wallet but we have not mentioned them so far. We've been using `u64` because they're a good type for counting things! `u64` is fine in terms of the way it works but it's not descriptive.
+We said we were making a Bitcoin wallet but we haven't mentioned Bitcoin so far. We've been using `u64` because it's a good type for counting things! `u64` works fine functionally but it's not descriptive.
 
 Rust has a feature called [type alias](https://doc.rust-lang.org/book/ch20-03-advanced-types.html#creating-type-synonyms-with-type-aliases) which allows us to create a new name for an existing type. This is useful when you want to give a more meaningful name to a type, or when you want to create a type that is more specific than the original type.
 
-The another way we can think of is using [new type pattern](https://doc.rust-lang.org/book/ch20-02-advanced-traits.html#using-the-newtype-pattern-to-implement-external-traits-on-external-types) which is a wrapper around the existing type. This is useful when you want to add some domain specific functionality on top of existing types and hide internal implementation details.
+Another approach we can consider is using the [new type pattern](https://doc.rust-lang.org/book/ch20-02-advanced-traits.html#using-the-newtype-pattern-to-implement-external-traits-on-external-types), which is a wrapper around an existing type. This is useful when you want to add domain-specific functionality on top of existing types and hide internal implementation details.
 
 For now, let's use type alias to make it simple.
 
@@ -201,9 +201,9 @@ mod specs_for_wallet {
 
 `BitCoin` is just a alias or synonym of `u64`, so we can use `BitCoin` just like `u64`.
 
-One limitation of type alias is that we cannot implement external traits on it. For example, we cannot implement `Display` trait on `BitCoin` type. This is because `BitCoin` is just a alias of `u64`, and we cannot implement external traits on external types due to the [orphan rule](https://doc.rust-lang.org/stable/book/ch10-02-traits.html#implementing-a-trait-on-a-type).
+One limitation of type aliases is that we cannot implement external traits on them. For example, we cannot implement the `Display` trait on the `BitCoin` type. This is because `BitCoin` is just an alias for `u64`, and we cannot implement external traits on external types due to the [orphan rule](https://doc.rust-lang.org/stable/book/ch10-02-traits.html#implementing-a-trait-on-a-type).
 
-If we have to add some domain specific functionality on top of existing types, we can use the new type pattern. This allows us to avoid the orphan rule and implement external traits on our own types.
+If we need to add domain-specific functionality on top of existing types, we can use the new type pattern. This allows us to circumvent the orphan rule and implement external traits on our own types.
 
 ## The Second Requirement: Withdraw Bitcoin
 
@@ -298,11 +298,11 @@ Nothing to refactor now.
 
 What should happen if you try to Withdraw more than is left in the account? For now, our requirement is to assume there is not an overdraft facility.
 
-How do we signal a problem when using Withdraw?
+How do we signal a problem when using withdraw?
 
-In Rust, if you want to indicate an error it is idiomatic for your function to return an `Result` for the caller to check and act on.
+In Rust, if you want to indicate an error, it is idiomatic for your function to return a `Result` for the caller to check and act on.
 
-The `Result` type is an enum that can be either `Ok` or `Err`. The `Ok` variant contains the value returned by the function, and the `Err` variant contains an error value.
+The `Result` type is an enum that can be either `Ok` or `Err`. The `Ok` variant contains the value returned by the function, while the `Err` variant contains an error value.
 
 Let's try this out in a test.
 
@@ -377,11 +377,11 @@ mod specs_for_wallet {
 
 There are two things to note here.
 
-First, we've added a new test to check that the `withdraw` method returns an `Ok` result when the amount is less than or equal to the balance. You might think "why not just assert the result in the `sut_withdraws_correctly` test?". You can do this if you are accustomed to the business logic so that you are confident to have larger test cases. But if you are not sure about what you are doing, it is better to write test cases with a small scope.
+First, we've added a new test to check that the `withdraw` method returns an `Ok` result when the amount is less than or equal to the balance. You might think "why not just assert the result in the `sut_withdraws_correctly` test?". You can do this if you are familiar with the business logic and confident about having larger test cases. However, if you are unsure about what you are doing, it's better to write test cases with a small scope.
 
-For the case of `withdraw`, it has two responsibilities: to change the balance and to return a result. So we can separate them into two tests. The `sut_withdraws_correctly` test is only checking the balance change after the withdrawal. The `sut_returns_ok_if_withdrawing_less_than_or_equal_balance` test is checking the result of the withdrawal. This is a good practice to keep your tests small and focused. As I said before, you can combine them if you are confident about it.
+In the case of `withdraw`, it has two responsibilities: to change the balance and to return a result. So we can separate them into two tests. The `sut_withdraws_correctly` test only checks the balance change after the withdrawal. The `sut_returns_ok_if_withdrawing_less_than_or_equal_balance` test checks the result of the withdrawal. This is a good practice to keep your tests small and focused. As mentioned before, you can combine them if you are confident about it.
 
-Second, as the test name `sut_returns_ok_if_withdrawing_less_than_or_equal_balance` suggests, we have to test two cases: one for the case of withdrawing less than the balance and one for the case of withdrawing equal to the balance. To do that, as we learned in the [previous section](./structs_methods_and_traits.md), we can use parameterised tests.
+Second, as the test name `sut_returns_ok_if_withdrawing_less_than_or_equal_balance` suggests, we need to test two cases: one for withdrawing less than the balance and one for withdrawing equal to the balance. To do that, as we learned in the [previous section](./structs_methods_and_traits.md), we can use parameterized tests.
 
 ### Try to Run the Test
 
@@ -393,7 +393,7 @@ error[E0599]: no method named `is_err` found for unit type `()` in the current s
    |                        ^^^^^^ method not found in `()`
 ```
 
-The wording is perhaps a little unclear, but our previous intent with `withdraw` was just to call it, it will never return a value. To make this compile we will need to change it so it has a return type.
+The wording is perhaps a little unclear, but our previous intent with `withdraw` was just to call it; it would never return a value. To make this compile, we will need to change it so it has a return type.
 
 ### Write the Minimal Amount of Code
 
@@ -404,7 +404,7 @@ pub fn withdraw(&mut self, amount: BitCoin) -> Result<(), String> {
 }
 ```
 
-Again, it is very important to just write enough code to satisfy the compiler. We correct our `withdraw` method to return error and for now we have to return something so let's just return `Ok(())`.
+Again, it is very important to just write enough code to satisfy the compiler. We correct our `withdraw` method to return an error, and for now we have to return something, so let's just return `Ok(())`.
 
 ### Write Enough Code to Make It Pass
 
@@ -430,7 +430,7 @@ Diagnostics:
 2. use `let _ = ...` to ignore the resulting value: `let _ = ` [unused_must_use]
 ```
 
-This is because we didn't handle the `Result` instance returned from `withdraw` method. This warning is useful because it reminds us that we should handle the error case. In this case, we can ignore the result because we are not interested in the result of the withdrawal. But in general, we should handle the result to avoid unexpected errors.
+This is because we didn't handle the `Result` instance returned from the `withdraw` method. This warning is useful because it reminds us that we should handle the error case. In this case, we can ignore the result because we are not interested in the result of the withdrawal. However, in general, we should handle the result to avoid unexpected errors.
 
 Let's fix this by using `let _ =` to ignore the result.
 
@@ -453,11 +453,11 @@ fn sut_withdraws_correctly() {
 
 ## The Fourth Requirement: Enhanced Error Reporting
 
-Hopefully when returning an error with string "oh no", you were thinking that we might iterate on that because it doesn't seem that useful to return.
+Hopefully when returning an error with the string "oh no", you were thinking that we might iterate on that because it doesn't seem very useful to return.
 
-The error gets returned to the caller. The caller should be able to handler differently based on the error types. For example, if the user tries to withdraw more than the balance, we need to report the details error message to the user. If there are temporal errors like network errors, the caller need to retry the operation. So we need to define the error types and return them to the caller.
+The error gets returned to the caller. The caller should be able to handle differently based on the error types. For example, if the user tries to withdraw more than the balance, we need to report a detailed error message to the user. If there are temporary errors like network errors, the caller needs to retry the operation. So we need to define the error types and return them to the caller.
 
-There are several ways to define error types in Rust, and the most common way is to use an enum.
+There are several ways to define error types in Rust, with the most common approach being to use an enum.
 
 ### Write the Test First
 
@@ -479,13 +479,13 @@ fn sut_returns_error_if_withdrawing_more_than_balance() {
 }
 ```
 
-In the test, we have used `wallet.withdraw(30).unwrap_err()` to get the error value from the `Result` type. If the `Result` is `Ok`, it will panic. If the `Result` is `Err`, it will return the error value. So the statement have two purposes: to assert that the result is error and to get the error value.
+In the test, we have used `wallet.withdraw(30).unwrap_err()` to get the error value from the `Result` type. If the `Result` is `Ok`, it will panic. If the `Result` is `Err`, it will return the error value. So this statement has two purposes: to assert that the result is an error and to get the error value.
 
-We also used `matches!` macro in assert stage to check if the error is of type `WalletError::InsufficientFunds`. [`matches!`](https://doc.rust-lang.org/std/macro.matches.html) macro returns whether the given expression matches the provided pattern. `matches!(actual, Wallet::InsufficientFunds(_))` checks if the `actual` value is of type `WalletError::InsufficientFunds`. The `_` is a wildcard pattern that matches any value. So we can use it to check if the error is of type `WalletError::InsufficientFunds` without caring about the value.
+We also used the `matches!` macro in the assert stage to check if the error is of type `WalletError::InsufficientFunds`. The [`matches!`](https://doc.rust-lang.org/std/macro.matches.html) macro returns whether the given expression matches the provided pattern. `matches!(actual, WalletError::InsufficientFunds(_))` checks if the `actual` value is of type `WalletError::InsufficientFunds`. The `_` is a wildcard pattern that matches any value. So we can use it to check if the error is of type `WalletError::InsufficientFunds` without caring about the value.
 
-The error message value for providing an helpful message to users can be asserted with `assert_eq!(actual.to_string(), "cannot withdraw, insufficient funds")`. The `to_string()` method is implemented for the `WalletError` enum, so we can use it to get the string representation of the error.
+The error message value for providing a helpful message to users can be asserted with `assert_eq!(actual.to_string(), "cannot withdraw, insufficient funds")`. The `to_string()` method is implemented for the `WalletError` enum, so we can use it to get the string representation of the error.
 
-We can use `assert_eq!(actual, WalletError::InsufficientFunds(String::from("cannot withdraw, insufficient funds")))` to check the error value in a single statement. Sure, we can do that! To compare the two values, we need to implement the `PartialEq` trait for the `WalletError` enum by deriving above the enum like `#[derive(PartialEq)]`. In my perspective, this is not a good practice to implement useless things only for testing. Enum comparison is not needed in the production code. In the caller side of the `withdraw` method, we might handle the error by pattern matching of error enum. So we don't need to implement the `PartialEq` trait for the `WalletError` enum. So I prefer to use `matches!` macro to check the error type and `to_string()` method to check the error message in this context.
+We can use `assert_eq!(actual, WalletError::InsufficientFunds(String::from("cannot withdraw, insufficient funds")))` to check the error value in a single statement. Sure, we can do that! To compare the two values, we need to implement the `PartialEq` trait for the `WalletError` enum by deriving it above the enum like `#[derive(PartialEq)]`. In my opinion, this is not a good practice to implement features only for testing. Enum comparison is not needed in the production code. On the caller side of the `withdraw` method, we might handle the error by pattern matching the error enum. So we don't need to implement the `PartialEq` trait for the `WalletError` enum. Therefore, I prefer to use the `matches!` macro to check the error type and the `to_string()` method to check the error message in this context.
 
 ### Try to Run the Test
 
@@ -605,5 +605,5 @@ I recommend changing the code to use new type pattern instead of type alias afte
 
 - Errors are the way to signify failure when calling a function/method
 - Checking for a message written as string in an error would result in a flaky test
-- Used enum and thiserror create to define error types
+- Used enum and thiserror crate to define error types
 - This is not the end of the story with error handling, you can do more sophisticated things but this is just an intro
