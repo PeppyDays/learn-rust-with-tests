@@ -1,12 +1,10 @@
 # Select
 
-<!-- TODO: Remove future!! -->
-
 You can find all the code for this chapter [here](https://github.com/PeppyDays/learn-rust-with-tests/tree/main/examples/select).
 
 ## The First Requirement: Find Faster URL
 
-You have been asked to make a function called WebsiteRacer which takes two URLs and "races" them by hitting them with an HTTP GET and returning the URL which returned first. If none of them return within 10 seconds then it should return an error.
+You've been asked to create a function called WebsiteRacer that takes two URLs and "races" them by sending HTTP GET requests, returning whichever URL responds first. If neither returns within 10 seconds, it should return an error.
 
 For this, we will be using:
 
@@ -40,7 +38,7 @@ mod specs_for_race {
 }
 ```
 
-We know this isn't perfect and has problems, but it's a start. It's important not to get too hung-up on getting things perfect first time.
+We know this isn't perfect and has problems, but it's a start. Avoid getting hung up on perfection initially.
 
 ### Try to Run the Test
 
@@ -67,7 +65,7 @@ called `Result::unwrap()` on an `Err` value: "not implemented yet"
 
 ### Write Enough Code to Make It Pass
 
-To make a HTTP request, we will use the reqwest crate. The crate supports asynchronous call, so let's use tokio and futures crates together. First, we need to add it to our `Cargo.toml`:
+To make HTTP requests, we'll use the reqwest crate. Since it supports asynchronous calls, we'll use it with tokio and futures crates. First, add them to `Cargo.toml`:
 
 ```toml
 [dependencies]
@@ -105,26 +103,26 @@ pub async fn race<'a>(url_1: &'a str, url_2: &'a str) -> Result<&'a str, &'stati
 
 For each URL:
 
-- We use `std::time::Instant::now` to record just before we try and get the URL
-- Then we use `reqwest::Client.send` to try and perform an HTTP GET request against the URL
-  - This function returns an `Result<Response, Error>`, but so far we are not interested in these values
-- `std::time::Instant.elapsed` returns a duration of the difference
+- We use `std::time::Instant::now` to record the time before attempting to get the URL
+- Then we use `reqwest::Client.send` to perform an HTTP GET request
+  - This function returns `Result<Response, Error>`, but we're not interested in these values yet
+- `std::time::Instant.elapsed` returns the duration difference
 
-Once we have done this we simply compare the durations to see which is the quickest.
+Once completed, we simply compare durations to find the fastest.
 
 ### Problems
 
-This may or may not make the test pass for you. The problem is we're reaching out to real websites to test our own logic.
+This may or may not make the test pass. The problem is we're reaching out to real websites to test our logic.
 
-Testing code that uses HTTP is so common that Rust has a crate called [wiremock](https://docs.rs/wiremock/latest/wiremock/) which allows us to create mock HTTP servers that we can control.
+Testing HTTP code is so common that Rust provides the [wiremock](https://docs.rs/wiremock/latest/wiremock/) crate for creating controllable mock HTTP servers.
 
-In the [mocking](./mocking.md) and [dependency injection](./dependency_injection.md) chapters, we covered how ideally we don't want to be relying on external services to test our code because they can be:
+As covered in the [mocking](./mocking.md) and [dependency injection](./dependency_injection.md) chapters, we ideally avoid relying on external services for testing because they can be:
 
 - Slow
 - Flaky
-- Can't test edge cases
+- Unable to test edge cases
 
-Let's change our tests to use mocks so we have reliable servers to test against that we can control.
+Let's change our tests to use mocks for reliable, controllable test servers.
 
 ```rust
 #[cfg(test)]
@@ -168,19 +166,19 @@ mod specs_for_race {
 }
 ```
 
-The syntax may look a bit busy but just take your time.
+The syntax may look busy, but take your time.
 
-`MockServer::start` starts a new mock HTTP server in local laptop with actual port, which we can use to send requests to. It returns a `MockServer` instance that we can use to configure the server.
+`MockServer::start` starts a new mock HTTP server locally with an actual port for sending requests. It returns a `MockServer` instance for server configuration.
 
-We then use `Mock::given` to set up a mock for the server. We specify the HTTP method and path we want to match against, and then we use `respond_with` to define what the server should respond with when it receives a request that matches our criteria. You can see that we set a delay of 20 milliseconds for the slow server, which simulates a slow response. Finally, we mount the mock to the server using `mount`, which makes it active and ready to respond to requests.
+We use `Mock::given` to set up server mocks. We specify the HTTP method and path to match, then use `respond_with` to define the response for matching requests. Note the 20-millisecond delay for the slow server, simulating a slow response. Finally, we mount the mock using `mount`, making it active and ready to respond.
 
-It turns out there's really no extra magic here. `MockServer` which makes it easier to use with testing, as it finds an open port to listen on and then you can close it when you're done with your test.
+There's no magic here. `MockServer` simplifies testing by finding an open port and allowing cleanup after tests.
 
-If you re-run the test it will definitely pass now and should be faster. Play with these sleeps to deliberately break the test.
+Re-running the test should now pass and be faster. Experiment with these delays to deliberately break the test.
 
 ### Refactor
 
-We have some duplication in both our production code and test code.
+We have duplication in both production and test code.
 
 ```rust,ignore
 use std::time::Duration;
@@ -245,15 +243,15 @@ mod specs_for_race {
 }
 ```
 
-We've refactored creating our mock servers into a function called `arrange_server` to move some uninteresting code out of the test and reduce repetition.
+We've refactored mock server creation into an `arrange_server` function to remove uninteresting code from tests and reduce repetition.
 
 ## The Second Requirement: Synchronize Finding Processes
 
-Why are we testing the speeds of the websites one after another when Rust is great at concurrency? We should be able to check both at the same time. We don't really care about the exact response times of the requests, we just want to know which one comes back first.
+Why test website speeds sequentially when Rust excels at concurrency? We should check both simultaneously. We don't care about exact response times - just which returns first.
 
-To do this, we're going to introduce a new construct called `select` which helps us synchronise processes really easily and clearly.
+We'll introduce `select`, a construct that helps synchronize processes easily and clearly.
 
-We're trying to refactor our `race` function to use `select`, so that no need to write a new test for it. We can just change the implementation and see if it still passes.
+We're refactoring our `race` function to use `select`, so no new test is needed. We can change the implementation and verify it still passes.
 
 ```rust,ignore
 use reqwest::Client;
@@ -289,27 +287,27 @@ async fn ping<'a>(client: &'a Client, url: &str) -> Result<(), &'a str> {
 
 Let's break this down.
 
-We have defined a function `ping` which creates checks the URL. If sending a request fails, it returns an error. If it succeeds, it returns `Ok(())` because we don't care about the response code or body.
+We've defined a `ping` function that checks the URL. If sending a request fails, it returns an error. If successful, it returns `Ok(())` since we don't care about response code or body.
 
-The `tokio::select!` macro allows us to wait for multiple asynchronous operations to complete. It will return as soon as one of the operations completes, and we can handle the result accordingly. The `tokio::select!` macro can handle more than two branches. Each branch is structured as:
+The `tokio::select!` macro lets us wait for multiple asynchronous operations to complete. It returns as soon as one operation completes, allowing us to handle the result accordingly. The macro can handle more than two branches. Each branch follows this structure:
 
 ```plain
 <pattern> = <async expression> => <handler>,
 ```
 
-When the macro is evaluated, all the `<async expression>`s are aggregated and executed concurrently. When an expression completes, the result is matched against `<pattern>`. If the result matches the pattern, then all remaining async expressions are dropped and `<handler>` is executed.
+When evaluated, all `<async expression>`s are aggregated and executed concurrently. When an expression completes, the result is matched against `<pattern>`. If matching, all remaining async expressions are dropped and `<handler>` executes.
 
-If `<pattern>` does not match the result of the asynchronous computation, then the remaining asynchronous expressions continue to execute concurrently until the next one completes. At this time, the same logic is applied to that result.
+If `<pattern>` doesn't match the asynchronous computation result, remaining expressions continue executing concurrently until the next completes. The same logic applies to that result.
 
-In our select macro, we have two branches, one for each URL. If the response from the first URL comes first and is successful, we return `Ok(url_1)`. If the response from the second URL comes first and is successful, we return `Ok(url_2)`. If neither URL returns a successful response, we return an error.
+Our select macro has two branches, one per URL. If the first URL's response arrives first and succeeds, we return `Ok(url_1)`. If the second URL responds first and succeeds, we return `Ok(url_2)`. If neither returns a successful response, we return an error.
 
-After these changes, the intent behind our code is very clear and the implementation is actually simpler.
+These changes make our code's intent very clear while simplifying the implementation.
 
 ## The Third Requirement: Ignore Sending Request Error Branch
 
-In our current implementation, what happens if sending a request fails? Suppose that the first URL is down or not reachable. In that case, the `ping` function will return an error, and the `tokio::select!` macro will consume the first branch and leave the select macro, and return the error.
+In our current implementation, what happens when a request fails? If the first URL is down or unreachable, the `ping` function returns an error, the `tokio::select!` macro consumes the first branch, exits the select macro, and returns the error.
 
-But the behaviour is not what we want. Even though the first URL failed, we still want to check the second URL. If the second URL is successful, we should return it.
+This behavior isn't what we want. Even if the first URL fails, we should still check the second URL. If the second URL succeeds, we should return it.
 
 ### Write the Test First
 
@@ -342,9 +340,9 @@ async fn sut_returns_error_if_two_urls_are_failed_to_send_request() {
 }
 ```
 
-In the first test, we set the first URL to a non-existent URL, and the second URL to a mock server that will respond after 20 milliseconds. The first URL will fail to send a request before the second URL responds. We want to ensure that the failure from the first URL is ignored, and the second URL is returned as the result.
+In the first test, we set the first URL to a non-existent URL and the second to a mock server responding after 20 milliseconds. The first URL will fail before the second responds. We want to ensure the first URL's failure is ignored and the second URL is returned.
 
-The second test checks that if both URLs fail to send a request, we return an error.
+The second test verifies that when both URLs fail to send requests, we return an error.
 
 ### Try to Run the Test
 
@@ -373,13 +371,13 @@ pub async fn race<'a>(url_1: &'a str, url_2: &'a str) -> Result<&'a str, &'stati
 }
 ```
 
-Do you remember that select macro binds the result of the asynchronous expression to a pattern? If the pattern does not match, the branch is dropped and the select macro continues to the next branch. By using this property, we can ignore the result of the first ping when it fails, and keep waiting for the second ping to complete. The else branch is executed when all branches are dropped, which means that both pings failed.
+Remember that the select macro binds asynchronous expression results to patterns? If the pattern doesn't match, the branch drops and the select macro continues to the next branch. Using this property, we can ignore the first ping's failure and keep waiting for the second ping to complete. The else branch executes when all branches drop, meaning both pings failed.
 
-Run the tests again and they should pass.
+Run the tests again - they should pass.
 
 ### Refactor
 
-Nothing special to refactor, but we can just extract the error case in the tests.
+Nothing special to refactor, but we can extract the error case in tests.
 
 ```rust,ignore
 #[tokio::test]
@@ -414,9 +412,9 @@ fn arrange_server_with_error() -> String {
 }
 ```
 
-## The Forth Requirement: Timeout After 10 Seconds
+## The Fourth Requirement: Timeout After 10 Seconds
 
-Our final requirement was to return an error if Racer takes longer than 10 seconds.
+Our final requirement is returning an error if Racer takes longer than 10 seconds.
 
 ### Write the Test First
 
@@ -436,7 +434,7 @@ async fn sut_returns_error_if_a_server_does_not_respond_within_10s() {
 }
 ```
 
-We've made our test servers take longer than 10s to return to exercise this scenario.
+We've made our test servers take longer than 10 seconds to return, exercising this scenario.
 
 ### Try to Run the Test
 
@@ -459,15 +457,15 @@ async fn ping<'a>(client: &'a Client, url: &str) -> Result<(), &'a str> {
 }
 ```
 
-By putting a timeout on the request, we can ensure that if the request takes longer than 10 seconds, it will return an error.
+By adding a timeout to the request, we ensure that requests taking longer than 10 seconds return an error.
 
-You can also put a timeout on the `tokio::select!` macro itself, but in this case, there should be an error branch when the two branches are failed to send a request. So the only place we can modify the timeout is in the `ping` function.
+You could also put a timeout on the `tokio::select!` macro itself, but since we need an error branch when both branches fail to send requests, the only place to modify the timeout is in the `ping` function.
 
 ### Refactor
 
-The problem we have is that this test takes 10 seconds to run. For such a simple bit of logic, this doesn't feel great.
+The problem is this test takes 10 seconds to run. For such simple logic, this doesn't feel great.
 
-What we can do is make the timeout configurable. So in our test, we can have a very short timeout and then when the code is used in the real world it can be set to 10 seconds.
+We can make the timeout configurable. In our test, we can use a very short timeout, while real-world usage can use 10 seconds.
 
 How about adding a `timeout` parameter to the `race` function?
 
@@ -502,12 +500,12 @@ async fn ping<'a>(client: &'a Client, url: &str, timeout: Option<Duration>) -> R
 }
 ```
 
-This works, but we need to change all our caller and tests to pass the timeout in. Before rushing in, let's listen to them.
+This works, but we need to change all callers and tests to pass the timeout. Before rushing in, let's consider:
 
 - Do we care about the timeout in the "happy" test?
 - The requirements were explicit about the timeout
 
-Given this knowledge, let's do a little refactoring to be sympathetic to both our tests and the users of our code.
+Given this knowledge, let's refactor to accommodate both our tests and code users.
 
 ```rust,ignore
 const DEFAULT_TIMEOUT: Duration = Duration::from_secs(10);
@@ -546,7 +544,7 @@ async fn ping<'a>(client: &'a Client, url: &str, timeout: Option<Duration>) -> R
 }
 ```
 
-Our users and our tests can use `race` (which uses `race_with_configuration` under the hood) and our sad path test can use `race_with_configuration`.
+Our users and tests can use `race` (which uses `race_with_configuration` under the hood) while our sad path test can use `race_with_configuration`.
 
 ```rust,ignore
 #[tokio::test]
@@ -572,9 +570,9 @@ async fn sut_returns_error_if_a_server_does_not_respond_within_timeout() {
 ### Select
 
 - Helps you wait on multiple asynchronous operations
-- Sometimes you'll want to include sleep in one of your branches to prevent your system blocking forever
+- Sometimes you'll want to include sleep in branches to prevent infinite blocking
 
 ### Wiremock
 
-- A convenient way of creating test servers so you can have reliable and controllable tests
-- Uses the same interfaces as the "real" http servers which is consistent and less for you to learn
+- A convenient way to create test servers for reliable and controllable tests
+- Uses the same interfaces as real HTTP servers, providing consistency with less to learn

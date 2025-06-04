@@ -2,11 +2,11 @@
 
 You can find all the code for this chapter [here](https://github.com/PeppyDays/learn-rust-with-tests/tree/main/examples/integers).
 
-Integers work as you would expect. Let's write an `add` function to try things out. Create a new project where you want to practice with `cargo new integers`.
+Integers work as you'd expect. Let's write an `add` function to explore the basics. Create a new project with `cargo new integers`.
 
 ## Write the Test First
 
-Create a new file `src/lib.rs` and add the following code to test the `add` function:
+Create `src/lib.rs` and add the following test for our `add` function:
 
 ```rust
 #[cfg(test)]
@@ -29,7 +29,7 @@ mod specs_for_add {
 
 ## Try and Run the Test
 
-Run the test with the command `cargo test` and inspect the compilation error.
+Run `cargo test` and examine the compilation error:
 
 ```bash
 error[E0425]: cannot find function `add` in this scope
@@ -41,7 +41,7 @@ error[E0425]: cannot find function `add` in this scope
 
 ## Write the Minimal Amount of Code
 
-Write enough code to satisfy the compiler and that's all - remember we want to check that our tests fail for the correct reason.
+Write just enough code to satisfy the compiler - we want to verify our test fails for the right reason:
 
 ```rust
 pub fn add(x: i64, y: i64) -> i64 {
@@ -49,7 +49,7 @@ pub fn add(x: i64, y: i64) -> i64 {
 }
 ```
 
-Now run the tests, and we should be happy that the test is correctly reporting what is wrong.
+Run the tests again. The test should correctly report the failure:
 
 ```bash
 thread 'specs_for_add::sut_returns_4_if_arguments_are_2_and_2' panicked at src/lib.rs:20:9:
@@ -60,7 +60,7 @@ assertion `left == right` failed
 
 ## Write Enough Code to Make It Pass
 
-In the strictest sense of TDD, we should now write the minimal amount of code to make the test pass. A pedantic programmer may do this:
+In strict TDD, we'd write the minimal code to pass. A pedantic programmer might try:
 
 ```rust
 pub fn add(x: i64, y: i64) -> i64 {
@@ -68,13 +68,13 @@ pub fn add(x: i64, y: i64) -> i64 {
 }
 ```
 
-Ah hah! Foiled again, TDD is a sham right?
+Ah! Foiled again - is TDD a sham?
 
-We could write another test, with some different numbers to force that test to fail but that feels like a game of [cat and mouse](https://en.m.wikipedia.org/wiki/Cat_and_mouse). Some call this [EDFH](https://fsharpforfunandprofit.com/posts/return-of-the-edfh/).
+We could write another test with different numbers, but that becomes a game of [cat and mouse](https://en.m.wikipedia.org/wiki/Cat_and_mouse). Some call this [EDFH](https://fsharpforfunandprofit.com/posts/return-of-the-edfh/).
 
-Once we're more familiar with Rust's syntax, I will introduce a technique called "Property Based Testing", which would stop annoying developers and help you find bugs.
+Later, when we're more familiar with Rust syntax, I'll introduce "Property Based Testing" - a technique that helps find bugs and prevents such developer games.
 
-For now, let's fix it properly
+For now, let's implement it properly:
 
 ```rust
 pub fn add(x: i64, y: i64) -> i64 {
@@ -82,13 +82,13 @@ pub fn add(x: i64, y: i64) -> i64 {
 }
 ```
 
-If you re-run the tests, they should pass.
+Re-run the tests - they should pass.
 
 ## Refactor
 
-There's not a lot in the actual code we can really improve on here.
+There's not much to improve in the actual code here.
 
-You can add documentation comments to functions prefixed with `///` above the function signature, and these will appear in Rust documents just like when you look at the standard library's documentation. We will see the documentation in a moment.
+You can add documentation comments using `///` above function signatures. These appear in Rust documentation, just like the standard library docs:
 
 ```rust
 /// `add` takes two integers and returns the sum of them.
@@ -99,13 +99,13 @@ pub fn add(x: i64, y: i64) -> i64 {
 
 ## Documentation Tests
 
-If you really want to go the extra mile, you can make [documentation tests](https://doc.rust-lang.org/rustdoc/write-documentation/documentation-tests.html). You will find many examples in the standard library documentation.
+For extra thoroughness, you can create [documentation tests](https://doc.rust-lang.org/rustdoc/write-documentation/documentation-tests.html). You'll find many examples in the standard library documentation.
 
-Often code examples that can be found outside the codebase, such as a readme file, become out of date and incorrect compared to the actual code because they don't get checked.
+Code examples outside the codebase (like README files) often become outdated because they're not validated against actual code changes.
 
-Documentation tests are run whenever tests are executed. Because such examples are validated by the Rust compiler, you can be confident your documentation's examples always reflect current code behavior.
+Documentation tests run with your regular tests. Since the Rust compiler validates these examples, you can trust that your documentation always reflects current code behavior.
 
-You can add documentation tests by adding a code block to the documentation comments. The code block should start and finish with ```. Here is an example:
+Add documentation tests by including code blocks in documentation comments, surrounded by triple backticks:
 
 ````rust
 /// `add` takes two integers and returns the sum of them.
@@ -121,9 +121,9 @@ pub fn add(x: i64, y: i64) -> i64 {
 }
 ````
 
-Adding this code will cause the example to appear in the documentation. The example will also be run as part of the tests, so if you change the code in the example, it will fail.
+This code appears in the generated documentation and runs as part of your test suite. If you change the example code incorrectly, the test will fail.
 
-Running tests, we can see the documentation function is executed with no further arrangement from us.
+Running tests shows the documentation example executes automatically:
 
 ```bash
    Doc-tests integers
@@ -134,15 +134,14 @@ test src/lib.rs - add (line 6) ... ok
 test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
 ```
 
-Documentation tests are useful for demonstrating code that cannot run as unit tests, such as that which accesses the network, while guaranteeing the example at least compiles.
+Documentation tests are particularly useful for demonstrating code that can't run as unit tests (like network access) while guaranteeing the examples at least compile.
 
-To view the documentation, run the command `cargo doc --open`. This will open a browser window with the documentation for your project. You can also view the documentation for the standard library in the same way.
+View your documentation with `cargo doc --open`. This opens a browser window with your project's documentation, similar to viewing standard library documentation.
 
 ## Wrapping Up
 
-What we have covered:
-
-- More practice of the TDD workflow
-- Integers and those addition
-- Writing better documentation so users of our code can understand its usage quickly
-- Examples of how to use our code, which are checked as part of our tests
+What we've covered:
+- More TDD workflow practice
+- Integer arithmetic operations
+- Writing clear documentation for code users
+- Creating testable examples that stay current with your code

@@ -23,9 +23,9 @@ fn check_websites<'a>(urls: &'a [&str], checker: impl WebsiteChecker) -> HashMap
 }
 ```
 
-It results a map of each URL checked to a boolean value: `true` for a good response, and `false` for a bad response.
+It returns a map of each URL checked to a boolean value: `true` for a good response, and `false` for a bad response.
 
-You also have to pass in a `WebsiteChecker` implementation, which is a trait that has a single method, `check`, that takes a URL and returns a boolean indicating whether the website is up or not. This is used by the function `check_website` to check all the websites.
+You also have to pass in a `WebsiteChecker` implementation, which is a trait with a single method, `check`, that takes a URL and returns a boolean indicating whether the website is up or not. The `check_websites` function uses this to check all the websites.
 
 Using [dependency injection](./dependency_injection.md) has allowed them to test the function without making real HTTP calls, making it reliable and fast.
 
@@ -125,9 +125,9 @@ mod benches_for_check_websites {
 }
 ```
 
-The tests uses a new fake implementation of `WebsiteChecker` trait. `SlowWebsiteChecker` is deliberately slow. It uses `std::thread::sleep` to wait exactly twenty milliseconds and then it returns true. And then it will run the `check_websites` function with a list of ten URLs.
+The test uses a new fake implementation of the `WebsiteChecker` trait. `SlowWebsiteChecker` is deliberately slow. It uses `std::thread::sleep` to wait exactly twenty milliseconds and then it returns true. And then it will run the `check_websites` function with a list of ten URLs.
 
-To check the execution time, we use `println!` to print the duration of the execution. By default, the test will not print anything to the console, so we can see the execution time only when we run the test with `cargo nextest run --no-capture`.
+To check the execution time, we use `println!` to print the duration of the execution. By default, the test will not print anything to the console, so we can only see the execution time when we run the test with `cargo nextest run --no-capture`.
 
 ### Try and Run the Test
 
@@ -145,7 +145,7 @@ test specs_for_check_websites::check_sut_execution_time ... ok
 
 ### Write Enough Code to Make It Pass
 
-Now we can finally talk about concurrency which, for the purposes of the following, means "having more than one thing in progress." This is something that we do naturally everyday.
+Now we can finally talk about concurrency which, for the purposes of the following, means "having more than one thing in progress." This is something that we do naturally every day.
 
 For instance, this morning I made a cup of tea. I put the kettle on and then, while I was waiting for it to boil, I got the milk out of the fridge, got the tea out of the cupboard, found my favourite mug, put the teabag into the cup and then, when the kettle had boiled, I put the water in the cup.
 
@@ -153,9 +153,9 @@ What I didn't do was put the kettle on and then stand there blankly staring at t
 
 If you can understand why it's faster to make tea the first way, then you can understand how we will make `check_websites` faster. Instead of waiting for a website to respond before sending a request to the next website, we will tell our computer to make the next request while it is waiting.
 
-Normally in Rust, when we call a function `do_something` we wait for it to return (even if it has no value to return, we still wait for it to finish). We say that this operation is blocking - it makes us wait for it to finish. An operation that does not block in Rust will run in a separate process. Think of a process as reading down the page of Rust code from top to bottom, going 'inside' each function when it gets called to read what it does. When a separate process starts, it's like another reader begins reading inside the function, leaving the original reader to carry on going down the page.
+Normally in Rust, when we call a function `do_something` we wait for it to return (even if it has no value to return, we still wait for it to finish). We say that this operation is blocking - it makes us wait for it to finish. An operation that does not block in Rust will run in a separate process. Think of a process as reading down the page of Rust code from top to bottom, going 'inside' each function when it gets called to read what it does. When a separate process starts, it's like another reader begins reading inside the function, leaving the original reader to continue down the page.
 
-We will use [Tokio](https://tokio.rs), an asynchronous runtime for Rust, to run our code concurrently. This allows us to run multiple tasks at the same time without blocking the main thread. Rust only provides the interface for asynchronous runtime, so we need to use external libraries like [Tokio](https://tokio.rs) or [Async Std](https://async.rs) to actually run our code concurrently.
+We will use [Tokio](https://tokio.rs), an asynchronous runtime for Rust, to run our code concurrently. This allows us to run multiple tasks at the same time without blocking the main thread. Rust only provides the interface for asynchronous programming, so we need to use external libraries like [Tokio](https://tokio.rs) or [Async Std](https://async.rs) to actually run our code concurrently.
 
 To use Tokio, we need to add it to our `Cargo.toml`:
 
@@ -407,13 +407,13 @@ pub async fn check_websites<'a>(
 
 ## The Second Requirement: Faster Website Checker with Multiple Threads
 
-Now we have a concurrent website checker, but it can be throttled when there are many tasks to do. Basically the code we wrote only uses a single thread. Remember that when we use `std::thread::sleep`, it blocks the thread, and we can only run one task at a time on that thread. This means that if we have many websites to check, we will still be waiting for each website to respond one by one.
+Now we have a concurrent website checker, but it can be throttled when there are many tasks to perform. The code we wrote essentially uses only a single thread. Remember that when we use `std::thread::sleep`, it blocks the thread, and we can only run one task at a time on that thread. This means that if we have many websites to check, we will still be waiting for each website to respond sequentially.
 
 We can make it even better by using multiple threads. This is where the Tokio runtime comes in handy. It allows us to run our code on multiple threads, which can significantly speed up our website checker.
 
 ### Write a Test First
 
-To make a test for multiple threads, we need to change the way we run our tests. Instead of using `#[tokio::test]`, we will use `#[tokio::test(flavor = "multi_thread", worker_threads = 5)]`. This will allow us to run our tests on multiple threads, with a maximum of five worker threads. If you see [here](https://docs.rs/tokio/latest/tokio/attr.test.html), you can see that the default of `#[tokio::test]` is `flavor = "current_thread"` with single-threaded. By setting `flavor = "multi_thread", worker_thread = 5`, we can run our tests on multiple threads.
+To make a test for multiple threads, we need to change the way we run our tests. Instead of using `#[tokio::test]`, we will use `#[tokio::test(flavor = "multi_thread", worker_threads = 5)]`. This will allow us to run our tests on multiple threads, with a maximum of five worker threads. If you see [here](https://docs.rs/tokio/latest/tokio/attr.test.html), you can see that the default of `#[tokio::test]` is `flavor = "current_thread"` with single-threaded execution. By setting `flavor = "multi_thread", worker_threads = 5`, we can run our tests on multiple threads.
 
 ```rust,ignore
 #[tokio::test(flavor = "multi_thread", worker_threads = 5)]
@@ -510,7 +510,7 @@ pub async fn check_websites<'a>(
 }
 ```
 
-We ran `tokio::spawn` on each `checker.check(url).await` call, passing the URL as a `String` and cloned checker. As I said, the asynchronous task can be run in any threads so that any references are not allowed, which means we have to transfer owned type. That's the reason why we add `Clone` trait on `WebsiteChecker` trait as well.
+We ran `tokio::spawn` on each `checker.check(url).await` call, passing the URL as a `String` and a cloned checker. As mentioned, the asynchronous task can run on any thread, so references are not allowed, which means we have to transfer owned types. That's why we added the `Clone` trait to the `WebsiteChecker` trait as well.
 
 We also collect the handles of the spawned tasks and wait for them to finish using `join_all`.
 
@@ -670,11 +670,11 @@ Execution time: 50.451584ms
 test benches_for_check_websites::check_sut_execution_time ... ok
 ```
 
-The result shows a bit different pattern. The first five checks started at the same time, and then they finished one by one. This is because we have five worker threads, and each thread can run one task at a time. If we adjust the number of threads, we can see the difference in execution time. For example, if we change `worker_threads = 10`, we can run ten tasks at the same time so that the execution time will be roughly 20 milliseconds.
+The result shows a slightly different pattern. The first five checks started at the same time, and then they finished one by one. This is because we have five worker threads, and each thread can run one task at a time. If we adjust the number of threads, we can see the difference in execution time. For example, if we change `worker_threads = 10`, we can run ten tasks at the same time, so the execution time will be roughly 20 milliseconds.
 
 ### Refactor
 
-We can change the test `check_sut_execution_time` to assert that the execution runs concurrently. By setting the number of threads and URLs same, we must see that the execution time is less than the sum of the delays of each URL check.
+We can change the test `check_sut_execution_time` to assert that the execution runs concurrently. By setting the number of threads and URLs to be the same, we should see that the execution time is less than the sum of the delays of each URL check.
 
 ```rust,ignore
 #[tokio::test(flavor = "multi_thread", worker_threads = 5)]

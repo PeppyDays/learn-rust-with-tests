@@ -2,11 +2,11 @@
 
 You can find all the code for this chapter [here](https://github.com/PeppyDays/learn-rust-with-tests/tree/main/examples/iteration).
 
-To do stuff repeatedly, you needs `loop`, `while` and `for`. The `loop` keyword creates an infinite loop, which you can break out of with the `break` keyword. The `while` loop is a conditional loop that continues until the condition is false. The `for` loop iterates over a collection, such as an array or a vector.
+For repetitive tasks, Rust provides `loop`, `while`, and `for`. The `loop` keyword creates an infinite loop that you exit with `break`. The `while` loop continues until a condition becomes false. The `for` loop iterates over collections like arrays or vectors.
 
 Let's write a test for a function that repeats a character 10 times.
 
-There's nothing new so far, so try and write it yourself for practice.
+Nothing new here - try writing it yourself for practice.
 
 ## Write the Test First
 
@@ -40,7 +40,7 @@ error[E0425]: cannot find function `repeat` in this scope
 
 ## Write the Minimal Amount of Code
 
-Keep the discipline! You don't need to know anything new right now to make the test fail properly. All you need to do right now is enough to make it compile so you can check your test is written well.
+Maintain discipline! You don't need new knowledge to make the test fail properly. Just write enough to compile and verify your test is well-written:
 
 ```rust
 pub fn repeat(c: &str) -> String {
@@ -48,9 +48,9 @@ pub fn repeat(c: &str) -> String {
 }
 ```
 
-Isn't it nice to know you already know enough Rust to write tests for some basic problems? This means you can now play with the production code as much as you like and know it's behaving as you'd hope.
+Isn't it satisfying to know you already understand enough Rust to write tests for basic problems? This means you can experiment with production code confidently, knowing it behaves as expected.
 
-Then, run the test again and see it fail with the reasonable message.
+Run the test again to see it fail with a meaningful message:
 
 ```bash
 thread 'specs_for_repeat::sut_repeats_given_argument_10_times' panicked at src/lib.rs:19:9:
@@ -61,7 +61,7 @@ assertion `left == right` failed
 
 ## Write Enough Code to Make It Pass
 
-The `for` syntax is very unremarkable and follows mock C-like language.
+The `for` syntax is straightforward and follows C-like conventions:
 
 ```rust
 pub fn repeat(c: &str) -> String {
@@ -73,15 +73,15 @@ pub fn repeat(c: &str) -> String {
 }
 ```
 
-Unlike other languages like C, Java, or JavaScript, there are no parentheses surrounding the three components of the for statement and the braces { } are always required.
+Unlike C, Java, or JavaScript, Rust requires no parentheses around the for statement components, and braces `{}` are always mandatory.
 
-Run the test and it should pass.
+Run the test - it should pass.
 
-Additional variants of the loop syntax are described [here](https://doc.rust-lang.org/stable/rust-by-example/flow_control.html).
+For additional loop syntax variants, see [here](https://doc.rust-lang.org/stable/rust-by-example/flow_control.html).
 
 ## Refactor
 
-Now it's time to refactor. You can extract the magic number 5 into a constant and introduce another construct `+=` assignment operator.
+Time to refactor! Extract the magic number into a constant and use the `+=` assignment operator:
 
 ```rust
 const REPEAT_COUNT: usize = 10;
@@ -97,9 +97,9 @@ pub fn repeat(c: &str) -> String {
 
 ## Benchmarking
 
-Writing benchmarks in Rust is provided in the unstable benchmarking system with `cargo bench`. To use the command in the stable version, you need to use the [criterion](https://github.com/bheisler/criterion.rs) crate, which is a powerful and flexible benchmarking library for Rust. It provides a simple and easy-to-use API for writing benchmarks, and it generates detailed reports with statistical analysis of the results.
+Rust's unstable benchmarking system uses `cargo bench`. For stable Rust, use the [criterion](https://github.com/bheisler/criterion.rs) crate - a powerful, flexible benchmarking library that provides simple APIs and detailed statistical reports.
 
-Let's configure criterion in the project. All is described in the [criterion documentation](https://bheisler.github.io/criterion.rs/book/getting_started.html). First, add criterion dependency to your `Cargo.toml` file:
+Let's configure criterion following the [documentation](https://bheisler.github.io/criterion.rs/book/getting_started.html). Add criterion to your `Cargo.toml`:
 
 ```toml
 [package]
@@ -117,9 +117,9 @@ name = "repeat"
 harness = false
 ```
 
-The `harness = false` line tells Cargo not to use the standard benchmark harness, which is important to disable to use criterion.
+The `harness = false` tells Cargo not to use the standard benchmark harness, which is necessary for criterion.
 
-After that, create a benchmark file in the `benches` directory called `repeat.rs` and add the following code:
+Create `benches/repeat.rs`:
 
 ```rust,ignore
 use criterion::Criterion;
@@ -141,11 +141,11 @@ criterion_group!(benches, bench_repeat);
 criterion_main!(benches);
 ```
 
-The function name `batch_repeat` doesn't matter, but it should be clear and understandable. Inside of the function is where the real work happens. The `c.bench_function` method takes a name for the benchmark and a closure that contains the code to be benchmarked. The `black_box` function is used to prevent the compiler from optimizing away the code being benchmarked, which can lead to inaccurate results.
+The function name `bench_repeat` should be clear and descriptive. The `c.bench_function` method takes a benchmark name and a closure containing the code to benchmark. The `black_box` function prevents compiler optimizations that could skew results.
 
-The last two lines are used to define the benchmark group and the main function for the benchmark. The `criterion_group!` macro creates a group of benchmarks, and the `criterion_main!` macro defines the main function that runs the benchmarks.
+The final two lines define the benchmark group and main function using the `criterion_group!` and `criterion_main!` macros.
 
-Now you can run the benchmark with `cargo bench` command.
+Run the benchmark with `cargo bench`:
 
 ```bash
      Running benches/repeat.rs (target/release/deps/repeat-f26c84f3dcacddd5)
@@ -158,9 +158,9 @@ Found 15 outliers among 100 measurements (15.00%)
   10 (10.00%) high severe
 ```
 
-You can find the meaning of output in details [here](https://bheisler.github.io/criterion.rs/book/user_guide/command_line_output.html). The most important part is the expected time the function takes to run, which is the number in the middle of the output time - 35.145 nanoseconds. The value is estimated based on the number of 145 millions iterations.
+Find detailed output explanations [here](https://bheisler.github.io/criterion.rs/book/user_guide/command_line_output.html). The key metric is the middle execution time: 35.145 nanoseconds, estimated from 145 million iterations.
 
-We can do better than that. The `repeat` function is not very efficient because it creates a new string for each iteration. We can use the `String::with_capacity` method to create a string with a pre-allocated capacity, which will reduce the number of allocations and improve performance. Also we can use the `push_str` method to append the string to the existing string, which is more efficient than using the `+=` operator.
+We can improve this. Our `repeat` function is inefficient because it creates new strings each iteration. Use `String::with_capacity` for pre-allocation and `push_str` for more efficient string appending:
 
 ```rust
 const REPEAT_COUNT: usize = 10;
@@ -174,7 +174,7 @@ pub fn repeat(c: &str) -> String {
 }
 ```
 
-Now you can run the benchmark again with `cargo bench` command, and see the difference in performance.
+Run `cargo bench` again to see the performance difference:
 
 ```bash
      Running benches/repeat.rs (target/release/deps/repeat-f26c84f3dcacddd5)
@@ -187,18 +187,18 @@ Found 3 outliers among 100 measurements (3.00%)
   1 (1.00%) high severe
 ```
 
-The performance has improved by 42% and the number of outliers has decreased.
+Performance improved by 42% with fewer outliers!
 
 ## Practice Exercises
 
-- Change the test so a caller can specify how many times the character is repeated and then fix the code
-- Write documentation on your function
-- Have a look through the [str](https://doc.rust-lang.org/std/primitive.str.html) and [String](https://doc.rust-lang.org/std/string/struct.String.html) documentation
-  - Find functions you think could be useful and experiment with them by writing tests like we have here
-  - Investigating time learning the standard library will really pay off over time
+- Modify the test so callers can specify repeat count, then update the code
+- Add documentation to your function
+- Explore the [str](https://doc.rust-lang.org/std/primitive.str.html) and [String](https://doc.rust-lang.org/std/string/struct.String.html) documentation
+  - Find useful functions and experiment with test-driven exploration
+  - Time spent learning the standard library pays tremendous dividends
 
 ## Wrapping Up
 
 - More TDD practice
-- Learned about `for` loops
-- Learned how to write benchmarks
+- Learned `for` loop usage
+- Learned benchmark writing techniques
