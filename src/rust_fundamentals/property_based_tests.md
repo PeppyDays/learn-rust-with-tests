@@ -106,6 +106,7 @@ fn sut_converts_2_to_II() {
     // Assert
     let expected = "II";
     assert_eq!(expected, actual);
+}
 ```
 
 ### Try to Run the Test
