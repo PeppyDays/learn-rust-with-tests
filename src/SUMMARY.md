@@ -21,6 +21,7 @@
 - [Select](./rust_fundamentals/select.md)
 - [Sync](./rust_fundamentals/sync.md)
 - [Property-based Tests](./rust_fundamentals/property_based_tests.md)
+- [Reading Files](./rust_fundamentals/reading_files.md)
 
 ---
 
