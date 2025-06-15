@@ -1,0 +1,11 @@
+[package]
+name = "blog"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+
+[dev-dependencies]
+fake = "4.3.0"
+rstest = "0.25.0"
+tempfile = "3.20.0"
